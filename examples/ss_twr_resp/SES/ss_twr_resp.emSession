@@ -55,8 +55,11 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="13" y="49" useTextEdit="1" path="../main.c" left="0" selected="1" top="32" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="23" y="29" useTextEdit="1" path="../ss_resp_main.c" left="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="16" y="135" useTextEdit="1" path="../main.c" left="0" top="116" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="19" y="143" useTextEdit="1" path="../ss_resp_main.c" left="0" top="120" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="8" y="268" useTextEdit="1" path="../../../deca_driver/deca_regs.h" left="0" top="238" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="4" y="141" useTextEdit="1" path="../../../deca_driver/deca_device.c" left="0" selected="1" top="141" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="21" y="533" useTextEdit="1" path="../../../nRF5_SDK_14.2.0/components/drivers_nrf/hal/nrf_gpio.h" left="0" top="90" codecName="Default"/>
  </Files>
- <EMStudioWindow activeProject="ss_twr_resp" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="nrf52832_xxaa" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <EMStudioWindow activeProject="ss_twr_resp" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="nrf52832_xxaa" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

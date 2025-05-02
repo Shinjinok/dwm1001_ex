@@ -41,7 +41,7 @@
 static dwt_config_t config = {
     5,                /* Channel number. */
     DWT_PRF_64M,      /* Pulse repetition frequency. */
-    DWT_PLEN_64,     /* Preamble length. Used in TX only. */
+    DWT_PLEN_128,     /* Preamble length. Used in TX only. */
     DWT_PAC8,         /* Preamble acquisition chunk size. Used in RX only. */
     10,               /* TX preamble code. Used in TX only. */
     10,               /* RX preamble code. Used in RX only. */
@@ -76,7 +76,17 @@ TimerHandle_t led_toggle_timer_handle;  /**< Reference to LED1 toggling FreeRTOS
 #endif
 
 #ifdef USE_FREERTOS
+void read_tx_power_decadriver(void)
+{
+    uint8_t tx_power_val[4];
 
+    // TX_POWER 레지스터 (0x1E)에서 4바이트 읽기
+    dwt_readfromdevice(TX_POWER_ID, 0, 4, tx_power_val);
+
+    // 디버그 출력
+    printf("TX_POWER = 0x%02X%02X%02X%02X\n",
+           tx_power_val[0], tx_power_val[1], tx_power_val[2], tx_power_val[3]);
+}
 /**@brief LED0 task entry function.
  *
  * @param[in] pvParameter   Pointer that will be used as the parameter for the task.
@@ -120,14 +130,14 @@ int main(void)
 
   #ifdef USE_FREERTOS
     /* Create task for LED0 blinking with priority set to 2 */
-    UNUSED_VARIABLE(xTaskCreate(led_toggle_task_function, "LED0", configMINIMAL_STACK_SIZE + 200, NULL, 2, &led_toggle_task_handle));
+   // UNUSED_VARIABLE(xTaskCreate(led_toggle_task_function, "LED0", configMINIMAL_STACK_SIZE + 200, NULL, 2, &led_toggle_task_handle));
 
     /* Start timer for LED1 blinking */
     led_toggle_timer_handle = xTimerCreate( "LED1", TIMER_PERIOD, pdTRUE, NULL, led_toggle_timer_callback);
     UNUSED_VARIABLE(xTimerStart(led_toggle_timer_handle, 0));
 
     /* Create task for SS TWR Initiator set to 2 */
-    UNUSED_VARIABLE(xTaskCreate(ss_initiator_task_function, "SSTWR_INIT", configMINIMAL_STACK_SIZE + 200, NULL, 2, &ss_initiator_task_handle));
+    //UNUSED_VARIABLE(xTaskCreate(ss_initiator_task_function, "SSTWR_INIT", configMINIMAL_STACK_SIZE + 200, NULL, 2, &ss_initiator_task_handle));
   #endif // #ifdef USE_FREERTOS
   
   //-------------dw1000  ini------------------------------------	
@@ -139,7 +149,7 @@ int main(void)
   boUART_Init ();
   
   printf("Singled Sided Two Way Ranging Initiator Example \r\n");
-  
+  ;
   /* Reset DW1000 */
   reset_DW1000(); 
 
@@ -158,6 +168,8 @@ int main(void)
 
   /* Configure DW1000. */
   dwt_configure(&config);
+  //dwt_setsmarttxpower(true);
+  read_tx_power_decadriver();
 
   /* Apply default antenna delay value. See NOTE 2 below. */
   dwt_setrxantennadelay(RX_ANT_DLY);
@@ -170,6 +182,7 @@ int main(void)
   * As this example only handles one incoming frame with always the same delay and timeout, those values can be set here once for all. */
   dwt_setrxaftertxdelay(POLL_TX_TO_RESP_RX_DLY_UUS);
   dwt_setrxtimeout(65000); // Maximum value timeout with DW1000 is 65ms  
+  
 
   //-------------dw1000  ini------end---------------------------	
   // IF WE GET HERE THEN THE LEDS WILL BLINK
@@ -177,7 +190,7 @@ int main(void)
   #ifdef USE_FREERTOS		
     /* Start FreeRTOS scheduler. */
     vTaskStartScheduler();	
-
+    
     while(1) 
     {};
   #else

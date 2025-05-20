@@ -30,6 +30,7 @@
 #define RNG_DELAY_MS 80
 
 /* Frames used in the ranging process. See NOTE 2,3 below. */
+static uint8 rx_blink_msg[] = { 0xc5,0x00,0x00, 0x05, 0x00, 0x10, 0x00, 0x01, 0xCA, 0xDE};
 static uint8 rx_poll_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'W', 'A', 'V', 'E', 0xE0, 0, 0};
 static uint8 tx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'V', 'E', 'W', 'A', 0xE1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -54,7 +55,7 @@ static uint8 rx_buffer[RX_BUF_LEN];
 static uint32 status_reg = 0;
 
 /* UWB microsecond (uus) to device time unit (dtu, around 15.65 ps) conversion factor.
-* 1 uus = 512 / 499.2 µs and 1 µs = 499.2 * 128 dtu. */
+* 1 uus = 512 / 499.2 s and 1 s = 499.2 * 128 dtu. */
 #define UUS_TO_DWT_TIME 65536
 
 // Not enough time to write the data so TX timeout extended for nRF operation.
@@ -129,7 +130,7 @@ int ss_resp_run(void)
     /* Check that the frame is a poll sent by "SS TWR initiator" example.
     * As the sequence number field of the frame is not relevant, it is cleared to simplify the validation of the frame. */
     rx_buffer[ALL_MSG_SN_IDX] = 0;
-    if (memcmp(rx_buffer, rx_poll_msg, ALL_MSG_COMMON_LEN) == 0)
+    if (memcmp(rx_buffer, rx_blink_msg, ALL_MSG_COMMON_LEN) == 0)
     {
       uint32 resp_tx_time;
       int ret;

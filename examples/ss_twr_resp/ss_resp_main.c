@@ -28,7 +28,20 @@
 
 /* Inter-ranging delay period, in milliseconds. See NOTE 1*/
 #define RNG_DELAY_MS 80
+typedef struct
+{
+    uint16 header ;           //!< 0xAA 0xBB
+    uint16 network_number ;
+    uint64 myNumber ; 
+    uint16 sqnumber;
+    int32 x ;          //mm
+    int32 y ;         //
+    int32 z ;         //
+    uint32 delay;   //dtu
+    uint16 check ;      
+} ups_message_t ;
 
+static ups_message_t my_msg = {0xbbaa, 1, 2, 1, 100,200,-100,300,0};
 /* Frames used in the ranging process. See NOTE 2,3 below. */
 static uint8 rx_blink_msg[] = { 0xc5,0x00,0x00, 0x05, 0x00, 0x10, 0x00, 0x01, 0xCA, 0xDE};
 static uint8 rx_poll_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'W', 'A', 'V', 'E', 0xE0, 0, 0};
@@ -48,7 +61,7 @@ static uint8 frame_seq_nb = 0;
 
 /* Buffer to store received response message.
 * Its size is adjusted to longest frame that this example code is supposed to handle. */
-#define RX_BUF_LEN 24
+#define RX_BUF_LEN 100
 static uint8 rx_buffer[RX_BUF_LEN];
 
 /* Hold copy of status register state here for reference so that it can be examined at a debug breakpoint. */
@@ -129,12 +142,13 @@ int ss_resp_run(void)
 
     /* Check that the frame is a poll sent by "SS TWR initiator" example.
     * As the sequence number field of the frame is not relevant, it is cleared to simplify the validation of the frame. */
-    rx_buffer[ALL_MSG_SN_IDX] = 0;
-    if (memcmp(rx_buffer, rx_blink_msg, ALL_MSG_COMMON_LEN) == 0)
+   // rx_buffer[ALL_MSG_SN_IDX] = 0;
+    if (memcmp(rx_buffer,rx_blink_msg, 10) == 0)
     {
       uint32 resp_tx_time;
       int ret;
-
+      ups_message_t get_msg;
+      memcpy((void *) &get_msg,(const void *) &rx_buffer, sizeof(get_msg));
       /* Retrieve poll reception timestamp. */
       poll_rx_ts = get_rx_timestamp_u64();
 
@@ -315,4 +329,3 @@ void ss_responder_task_function (void * pvParameter)
 *    DW1000 API Guide for more details on the DW1000 driver functions.
 *
 ****************************************************************************************************************************************************/
- 

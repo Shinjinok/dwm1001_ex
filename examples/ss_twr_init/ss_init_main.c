@@ -26,6 +26,7 @@
 #include "deca_device_api.h"
 #include "deca_regs.h"
 #include "port_platform.h"
+#include "UART.h"
 
 #define APP_NAME "SS TWR INIT v1.3"
 
@@ -33,6 +34,7 @@
 #define RNG_DELAY_MS 100
 
 /* Frames used in the ranging process. See NOTE 1,2 below. */
+static uint8 rx_blink_msg[] = { 0xc5,0x00,0x00, 0x05, 0x00, 0x10, 0x00, 0x01, 0xCA, 0xDE};
 static uint8 tx_poll_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'W', 'A', 'V', 'E', 0xE0, 0, 0};
 static uint8 rx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'V', 'E', 'W', 'A', 0xE1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 /* Length of the common part of the message (up to and including the function code, see NOTE 1 below). */
@@ -72,6 +74,20 @@ static void resp_msg_get_ts(uint8 *ts_field, uint32 *ts);
 static volatile int tx_count = 0 ; // Successful transmit counter
 static volatile int rx_count = 0 ; // Successful receive counter 
 
+typedef struct
+{
+    uint16 header ;           //!< 0xAA 0xBB
+    uint16 network_number ;
+    uint64 myNumber ; 
+    uint16 sqnumber;
+    int32 x ;          //mm
+    int32 y ;         //
+    int32 z ;         //
+    uint32 delay;   //dtu
+    uint16 check ;      
+} ups_message_t ;
+
+static ups_message_t my_msg = {0xbbaa, 1, 2, 3, 4,5,6,7,0};
 /*! ------------------------------------------------------------------------------------------------------------------
 * @fn main()
 *
@@ -88,23 +104,28 @@ int ss_init_run(void)
 
 
   /* Loop forever initiating ranging exchanges. */
-  
+  char buffer[50];
   start = xTaskGetTickCount();
  
   
 
   /* Write frame data to DW1000 and prepare transmission. See NOTE 3 below. */
-  tx_poll_msg[ALL_MSG_SN_IDX] = frame_seq_nb;
+ // tx_poll_msg[ALL_MSG_SN_IDX] = frame_seq_nb;
+ // dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_TXFRS);
+ // dwt_writetxdata(sizeof(tx_poll_msg), tx_poll_msg, 0); /* Zero offset in TX buffer. */
+ // dwt_writetxfctrl(sizeof(tx_poll_msg), 0, 1); /* Zero offset in TX buffer, ranging. */
+  my_msg.sqnumber = frame_seq_nb;
   dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_TXFRS);
-  dwt_writetxdata(sizeof(tx_poll_msg), tx_poll_msg, 0); /* Zero offset in TX buffer. */
-  dwt_writetxfctrl(sizeof(tx_poll_msg), 0, 1); /* Zero offset in TX buffer, ranging. */
+  dwt_writetxdata(sizeof(my_msg), (uint8 *) &my_msg, 0); /* Zero offset in TX buffer. */
+  dwt_writetxfctrl(sizeof(my_msg), 0, 1); /* Zero offset in TX buffer, ranging. */
+
 
   /* Start transmission, indicating that a response is expected so that reception is enabled automatically after the frame is sent and the delay
   * set by dwt_setrxaftertxdelay() has elapsed. */
   dwt_starttx(DWT_START_TX_IMMEDIATE | DWT_RESPONSE_EXPECTED);
   tx_count++;
-  printf("Transmission # : %d\r\n",tx_count);
-
+  sprintf(buffer,"Transmission # : %d\r\n",tx_count);
+  boUART_puts(buffer);
 
   /* We assume that the transmission is achieved correctly, poll for reception of a frame or error/timeout. See NOTE 4 below. */
   while (!((status_reg = dwt_read32bitreg(SYS_STATUS_ID)) & (SYS_STATUS_RXFCG | SYS_STATUS_ALL_RX_TO | SYS_STATUS_ALL_RX_ERR)))
@@ -144,7 +165,8 @@ int ss_init_run(void)
     if (memcmp(rx_buffer, rx_resp_msg, ALL_MSG_COMMON_LEN) == 0)
     {	
       rx_count++;
-      printf("Reception # : %d\r\n",rx_count);
+      sprintf(buffer,"Reception # : %d\r\n",rx_count);
+      boUART_puts(buffer);
       uint32 poll_tx_ts, resp_rx_ts, poll_rx_ts, resp_tx_ts;
       int32 rtd_init, rtd_resp;
       float clockOffsetRatio ;
@@ -166,12 +188,15 @@ int ss_init_run(void)
 
       tof = ((rtd_init - rtd_resp * (1.0f - clockOffsetRatio)) / 2.0f) * DWT_TIME_UNITS; // Specifying 1.0f and 2.0f are floats to clear warning 
       distance = tof * SPEED_OF_LIGHT;
-      printf("Distance : %f\r\n",distance);
+      sprintf(buffer,"Distance : %f\r\n",distance);
+      boUART_puts(buffer);
 
       end = xTaskGetTickCount();
       TickType_t elapsed = end - start;
-      printf("Elapsed time: %lu ms\r\n", elapsed);
-      printf("clockOffsetRatio: %f\r\n", clockOffsetRatio);
+      sprintf(buffer,"Elapsed time: %lu ms\r\n", elapsed);
+      boUART_puts(buffer);
+      sprintf(buffer,"clockOffsetRatio: %f\r\n", clockOffsetRatio);
+      boUART_puts(buffer);
     }
   }
   else
@@ -180,7 +205,8 @@ int ss_init_run(void)
     dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_ALL_RX_TO | SYS_STATUS_ALL_RX_ERR);
     end = xTaskGetTickCount();
     TickType_t elapsed = end - start;
-    printf("Elapsed time: %lu ms\r\n", elapsed);
+    sprintf(buffer,"Elapsed time: %lu ms\r\n", elapsed);
+    boUART_puts(buffer);
     /* Reset RX to properly reinitialise LDE operation. */
     dwt_rxreset();
   }

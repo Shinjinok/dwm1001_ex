@@ -14,6 +14,7 @@
 
 #define DW1000_RST    24
 #define DW1000_IRQ    19
+#define BT_WAKE_UP    2
 
 // LEDs definitions for DW1001_DEV_H
 #define LEDS_NUMBER    4

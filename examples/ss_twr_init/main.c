@@ -79,13 +79,15 @@ TimerHandle_t led_toggle_timer_handle;  /**< Reference to LED1 toggling FreeRTOS
 void read_tx_power_decadriver(void)
 {
     uint8_t tx_power_val[4];
+    char buffer[50];
 
     // TX_POWER 레지스터 (0x1E)에서 4바이트 읽기
     dwt_readfromdevice(TX_POWER_ID, 0, 4, tx_power_val);
 
     // 디버그 출력
-    printf("TX_POWER = 0x%02X%02X%02X%02X\n",
+    sprintf(buffer,"TX_POWER = 0x%02X%02X%02X%02X\r\n",
            tx_power_val[0], tx_power_val[1], tx_power_val[2], tx_power_val[3]);
+    boUART_puts(buffer);
 }
 /**@brief LED0 task entry function.
  *
@@ -130,14 +132,14 @@ int main(void)
 
   #ifdef USE_FREERTOS
     /* Create task for LED0 blinking with priority set to 2 */
-   // UNUSED_VARIABLE(xTaskCreate(led_toggle_task_function, "LED0", configMINIMAL_STACK_SIZE + 200, NULL, 2, &led_toggle_task_handle));
+    UNUSED_VARIABLE(xTaskCreate(led_toggle_task_function, "LED0", configMINIMAL_STACK_SIZE + 200, NULL, 2, &led_toggle_task_handle));
 
     /* Start timer for LED1 blinking */
     led_toggle_timer_handle = xTimerCreate( "LED1", TIMER_PERIOD, pdTRUE, NULL, led_toggle_timer_callback);
     UNUSED_VARIABLE(xTimerStart(led_toggle_timer_handle, 0));
 
     /* Create task for SS TWR Initiator set to 2 */
-    //UNUSED_VARIABLE(xTaskCreate(ss_initiator_task_function, "SSTWR_INIT", configMINIMAL_STACK_SIZE + 200, NULL, 2, &ss_initiator_task_handle));
+    UNUSED_VARIABLE(xTaskCreate(ss_initiator_task_function, "SSTWR_INIT", configMINIMAL_STACK_SIZE + 200, NULL, 2, &ss_initiator_task_handle));
   #endif // #ifdef USE_FREERTOS
   
   //-------------dw1000  ini------------------------------------	

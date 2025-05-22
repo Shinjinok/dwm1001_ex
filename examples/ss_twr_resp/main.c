@@ -38,6 +38,9 @@
 #include "deca_param_types.h"
 #include "deca_regs.h"
 #include "deca_device_api.h"
+//#include "app_gpiote.h"
+#include "app_button.h"
+#include "app_timer.h"
 
 // Defines ---------------------------------------------
 
@@ -99,10 +102,50 @@ static dwt_config_t config = {
   {
     UNUSED_PARAMETER(pvParameter);
     LEDS_INVERT(BSP_LED_1_MASK);
+    bool ret = nrf_gpio_pin_read(BT_WAKE_UP);
+    if(!ret){
+       LEDS_INVERT(BSP_LED_0_MASK);
+    }
 }
 
-#endif  // #ifdef USE_FREERTOS
+static void button_handler(uint8_t pin_no, uint8_t button_action)
+{
+    if(button_action == APP_BUTTON_PUSH)
+    {
+        nrf_gpio_pin_toggle(LED_0);
 
+    }
+}
+#define APP_TIMER_PRESCALER             0  // Value of the RTC1 PRESCALER register.
+#define APP_TIMER_MAX_TIMERS            1  // Maximum number of simultaneously created timers. 
+#define APP_TIMER_OP_QUEUE_SIZE         2  // Size of timer operation queues. 
+#define BUTTON_DEBOUNCE_DELAY			50 // Delay from a GPIOTE event until a button is reported as pushed. 
+#define APP_GPIOTE_MAX_USERS            1  // Maximum number of users of the GPIOTE handler. 
+static app_button_cfg_t p_button =  {BT_WAKE_UP, APP_BUTTON_ACTIVE_LOW, NRF_GPIO_PIN_PULLUP, button_handler};
+
+#endif  // #ifdef USE_FREERTOS
+//static void gpio_init(void)
+//{
+//  ret_code_t err_code;
+
+//  // Macro for initializing the application timer module.
+//    // It will handle dimensioning and allocation of the memory buffer required by the timer, making sure that the buffer is correctly aligned. It will also connect the timer module to the scheduler (if specified).
+//    APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_MAX_TIMERS, APP_TIMER_OP_QUEUE_SIZE, NULL);
+
+//    // Macro for initializing the GPIOTE module.
+//    // It will handle dimensioning and allocation of the memory buffer required by the module, making sure that the buffer is correctly aligned.
+//    APP_GPIOTE_INIT(APP_GPIOTE_MAX_USERS);
+
+//    // Initializing the buttons.
+//    err_code = app_button_init(&p_button, sizeof(p_button) / sizeof(p_button), BUTTON_DEBOUNCE_DELAY);
+//    APP_ERROR_CHECK(err_code);
+                                            
+//    // Enabling the buttons.										
+//    err_code = app_button_enable();
+//    APP_ERROR_CHECK(err_code);
+
+
+//}
 int main(void)
 {
   /* Setup some LEDs for debug Green and Blue on DWM1001-DEV */
@@ -122,10 +165,11 @@ int main(void)
   #endif  // #ifdef USE_FREERTOS
 
   //-------------dw1000  ini------------------------------------	
-
+  //gpio_init();
   /* Setup DW1000 IRQ pin */
   nrf_gpio_cfg_input(DW1000_IRQ, NRF_GPIO_PIN_NOPULL); 		//irq
 
+  
   /* Reset DW1000 */
   reset_DW1000(); 
 
@@ -156,8 +200,8 @@ int main(void)
   dwt_setrxtimeout(0);    // set to NO receive timeout for this simple example   
 
   //-------------dw1000  ini------end---------------------------	
-
-  // IF WE GET HERE THEN THE LEDS WILL BLINK
+  
+   // IF WE GET HERE THEN THE LEDS WILL BLINK
   #ifdef USE_FREERTOS
     /* Start FreeRTOS scheduler. */
     vTaskStartScheduler();	

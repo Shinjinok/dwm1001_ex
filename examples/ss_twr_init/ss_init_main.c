@@ -31,7 +31,7 @@
 #define APP_NAME "SS TWR INIT v1.3"
 
 /* Inter-ranging delay period, in milliseconds. */
-#define RNG_DELAY_MS 100
+#define RNG_DELAY_MS 5
 
 /* Frames used in the ranging process. See NOTE 1,2 below. */
 static uint8 rx_blink_msg[] = { 0xc5,0x00,0x00, 0x05, 0x00, 0x10, 0x00, 0x01, 0xCA, 0xDE};
@@ -49,7 +49,7 @@ static uint8 frame_seq_nb = 0;
 
 /* Buffer to store received response message.
 * Its size is adjusted to longest frame that this example code is supposed to handle. */
-#define RX_BUF_LEN 20
+#define RX_BUF_LEN 126
 static uint8 rx_buffer[RX_BUF_LEN];
 
 /* Hold copy of status register state here for reference so that it can be examined at a debug breakpoint. */
@@ -74,20 +74,17 @@ static void resp_msg_get_ts(uint8 *ts_field, uint32 *ts);
 static volatile int tx_count = 0 ; // Successful transmit counter
 static volatile int rx_count = 0 ; // Successful receive counter 
 
-typedef struct
-{
-    uint16 header ;           //!< 0xAA 0xBB
-    uint16 network_number ;
-    uint64 myNumber ; 
-    uint16 sqnumber;
-    int32 x ;          //mm
-    int32 y ;         //
-    int32 z ;         //
-    uint32 delay;   //dtu
-    uint16 check ;      
-} ups_message_t ;
+typedef struct blink_msg{
+	uint32_t header;
+	uint32_t anchor_id;
+	uint32_t sqnumber;
+	uint32_t delay_time;
+	int32_t	posx;
+	int32_t posy;
+	int32_t posz;
+}blink_msg_t;
 
-static ups_message_t my_msg = {0xbbaa, 1, 2, 3, 4,5,6,7,0};
+blink_msg_t my_msg= {0xccbbaac5, 0,0,0, 0,0,0};
 /*! ------------------------------------------------------------------------------------------------------------------
 * @fn main()
 *
@@ -97,7 +94,7 @@ static ups_message_t my_msg = {0xbbaa, 1, 2, 3, 4,5,6,7,0};
 *
 * @return none
 */
- TickType_t end,start;
+ TickType_t end,start,elapsed;
 
 int ss_init_run(void)
 {
@@ -105,8 +102,9 @@ int ss_init_run(void)
 
   /* Loop forever initiating ranging exchanges. */
   char buffer[50];
-  start = xTaskGetTickCount();
  
+ /* Activate reception immediately. */
+  dwt_rxenable(DWT_START_RX_IMMEDIATE);
   
 
   /* Write frame data to DW1000 and prepare transmission. See NOTE 3 below. */
@@ -114,35 +112,36 @@ int ss_init_run(void)
  // dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_TXFRS);
  // dwt_writetxdata(sizeof(tx_poll_msg), tx_poll_msg, 0); /* Zero offset in TX buffer. */
  // dwt_writetxfctrl(sizeof(tx_poll_msg), 0, 1); /* Zero offset in TX buffer, ranging. */
-  my_msg.sqnumber = frame_seq_nb;
-  dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_TXFRS);
-  dwt_writetxdata(sizeof(my_msg), (uint8 *) &my_msg, 0); /* Zero offset in TX buffer. */
-  dwt_writetxfctrl(sizeof(my_msg), 0, 1); /* Zero offset in TX buffer, ranging. */
+  //my_msg.sqnumber = frame_seq_nb;
+  //dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_TXFRS);
+  //dwt_writetxdata(sizeof(my_msg), (uint8 *) &my_msg, 0); /* Zero offset in TX buffer. */
+  //dwt_writetxfctrl(sizeof(my_msg), 0, 1); /* Zero offset in TX buffer, ranging. */
 
 
-  /* Start transmission, indicating that a response is expected so that reception is enabled automatically after the frame is sent and the delay
-  * set by dwt_setrxaftertxdelay() has elapsed. */
-  dwt_starttx(DWT_START_TX_IMMEDIATE | DWT_RESPONSE_EXPECTED);
-  tx_count++;
-  sprintf(buffer,"Transmission # : %d\r\n",tx_count);
-  boUART_puts(buffer);
+  ///* Start transmission, indicating that a response is expected so that reception is enabled automatically after the frame is sent and the delay
+  //* set by dwt_setrxaftertxdelay() has elapsed. */
+  //dwt_starttx(DWT_START_TX_IMMEDIATE | DWT_RESPONSE_EXPECTED);
+  //tx_count++;
+  //sprintf(buffer,"Transmission # : %d\r\n",tx_count);
+  //boUART_puts(buffer);
 
-  /* We assume that the transmission is achieved correctly, poll for reception of a frame or error/timeout. See NOTE 4 below. */
+
+  ///* We assume that the transmission is achieved correctly, poll for reception of a frame or error/timeout. See NOTE 4 below. */
   while (!((status_reg = dwt_read32bitreg(SYS_STATUS_ID)) & (SYS_STATUS_RXFCG | SYS_STATUS_ALL_RX_TO | SYS_STATUS_ALL_RX_ERR)))
   {};
 
-    #if 0  // include if required to help debug timeouts.
-    int temp = 0;		
-    if(status_reg & SYS_STATUS_RXFCG )
-    temp =1;
-    else if(status_reg & SYS_STATUS_ALL_RX_TO )
-    temp =2;
-    if(status_reg & SYS_STATUS_ALL_RX_ERR )
-    temp =3;
-    #endif
+  //  #if 0  // include if required to help debug timeouts.
+  //  int temp = 0;		
+  //  if(status_reg & SYS_STATUS_RXFCG )
+  //  temp =1;
+  //  else if(status_reg & SYS_STATUS_ALL_RX_TO )
+  //  temp =2;
+  //  if(status_reg & SYS_STATUS_ALL_RX_ERR )
+  //  temp =3;
+  //  #endif
 
-  /* Increment frame sequence number after transmission of the poll message (modulo 256). */
-  frame_seq_nb++;
+  ///* Increment frame sequence number after transmission of the poll message (modulo 256). */
+  //frame_seq_nb++;
 
   if (status_reg & SYS_STATUS_RXFCG)
   {		
@@ -152,7 +151,8 @@ int ss_init_run(void)
     dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_RXFCG);
 
     /* A frame has been received, read it into the local buffer. */
-    frame_len = dwt_read32bitreg(RX_FINFO_ID) & RX_FINFO_RXFLEN_MASK;
+    //frame_len = dwt_read32bitreg(RX_FINFO_ID) & RX_FINFO_RXFLEN_MASK;
+    frame_len = dwt_read32bitreg(RX_FINFO_ID) & RX_FINFO_RXFL_MASK_1023;
    
     if (frame_len <= RX_BUF_LEN)
     {
@@ -161,56 +161,57 @@ int ss_init_run(void)
 
     /* Check that the frame is the expected response from the companion "SS TWR responder" example.
     * As the sequence number field of the frame is not relevant, it is cleared to simplify the validation of the frame. */
-    rx_buffer[ALL_MSG_SN_IDX] = 0;
-    if (memcmp(rx_buffer, rx_resp_msg, ALL_MSG_COMMON_LEN) == 0)
-    {	
-      rx_count++;
-      sprintf(buffer,"Reception # : %d\r\n",rx_count);
-      boUART_puts(buffer);
-      uint32 poll_tx_ts, resp_rx_ts, poll_rx_ts, resp_tx_ts;
-      int32 rtd_init, rtd_resp;
-      float clockOffsetRatio ;
+   // rx_buffer[ALL_MSG_SN_IDX] = 0;
+    if (memcmp(rx_buffer, (void *) &my_msg, 4) == 0)
+    {
+      memcpy((void *) &my_msg,(const void *) &rx_buffer, sizeof(my_msg));	
+      
+            //uint32 poll_tx_ts, resp_rx_ts, poll_rx_ts, resp_tx_ts;
+      //int32 rtd_init, rtd_resp;
+      //float clockOffsetRatio ;
 
-      /* Retrieve poll transmission and response reception timestamps. See NOTE 5 below. */
-      poll_tx_ts = dwt_readtxtimestamplo32();
-      resp_rx_ts = dwt_readrxtimestamplo32();
+      ///* Retrieve poll transmission and response reception timestamps. See NOTE 5 below. */
+      //poll_tx_ts = dwt_readtxtimestamplo32();
+      //resp_rx_ts = dwt_readrxtimestamplo32();
 
-      /* Read carrier integrator value and calculate clock offset ratio. See NOTE 7 below. */
-      clockOffsetRatio = dwt_readcarrierintegrator() * (FREQ_OFFSET_MULTIPLIER * HERTZ_TO_PPM_MULTIPLIER_CHAN_5 / 1.0e6) ;
+      ///* Read carrier integrator value and calculate clock offset ratio. See NOTE 7 below. */
+      //clockOffsetRatio = dwt_readcarrierintegrator() * (FREQ_OFFSET_MULTIPLIER * HERTZ_TO_PPM_MULTIPLIER_CHAN_5 / 1.0e6) ;
 
-      /* Get timestamps embedded in response message. */
-      resp_msg_get_ts(&rx_buffer[RESP_MSG_POLL_RX_TS_IDX], &poll_rx_ts);
-      resp_msg_get_ts(&rx_buffer[RESP_MSG_RESP_TX_TS_IDX], &resp_tx_ts);
+      ///* Get timestamps embedded in response message. */
+      //resp_msg_get_ts(&rx_buffer[RESP_MSG_POLL_RX_TS_IDX], &poll_rx_ts);
+      //resp_msg_get_ts(&rx_buffer[RESP_MSG_RESP_TX_TS_IDX], &resp_tx_ts);
 
-      /* Compute time of flight and distance, using clock offset ratio to correct for differing local and remote clock rates */
-      rtd_init = resp_rx_ts - poll_tx_ts;
-      rtd_resp = resp_tx_ts - poll_rx_ts;
+      ///* Compute time of flight and distance, using clock offset ratio to correct for differing local and remote clock rates */
+      //rtd_init = resp_rx_ts - poll_tx_ts;
+      //rtd_resp = resp_tx_ts - poll_rx_ts;
 
-      tof = ((rtd_init - rtd_resp * (1.0f - clockOffsetRatio)) / 2.0f) * DWT_TIME_UNITS; // Specifying 1.0f and 2.0f are floats to clear warning 
-      distance = tof * SPEED_OF_LIGHT;
-      sprintf(buffer,"Distance : %f\r\n",distance);
-      boUART_puts(buffer);
+      //tof = ((rtd_init - rtd_resp * (1.0f - clockOffsetRatio)) / 2.0f) * DWT_TIME_UNITS; // Specifying 1.0f and 2.0f are floats to clear warning 
+      //distance = tof * SPEED_OF_LIGHT;
+      //sprintf(buffer,"Distance : %f\r\n",distance);
+      //boUART_puts(buffer);
 
-      end = xTaskGetTickCount();
-      TickType_t elapsed = end - start;
-      sprintf(buffer,"Elapsed time: %lu ms\r\n", elapsed);
-      boUART_puts(buffer);
-      sprintf(buffer,"clockOffsetRatio: %f\r\n", clockOffsetRatio);
-      boUART_puts(buffer);
+      //end = xTaskGetTickCount();
+      //TickType_t elapsed = end - start;
+      //sprintf(buffer,"Elapsed time: %lu ms\r\n", elapsed);
+      //boUART_puts(buffer);
+      //sprintf(buffer,"clockOffsetRatio: %f\r\n", clockOffsetRatio);
+      //boUART_puts(buffer);
+       
+    /* Reset RX to properly reinitialise LDE operation. */
     }
   }
   else
   {
     /* Clear RX error/timeout events in the DW1000 status register. */
     dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_ALL_RX_TO | SYS_STATUS_ALL_RX_ERR);
-    end = xTaskGetTickCount();
-    TickType_t elapsed = end - start;
-    sprintf(buffer,"Elapsed time: %lu ms\r\n", elapsed);
-    boUART_puts(buffer);
-    /* Reset RX to properly reinitialise LDE operation. */
+    
     dwt_rxreset();
   }
-
+start = xTaskGetTickCount();
+       elapsed = start - end;
+      end = start;
+    sprintf(buffer,"Elapsed time: %lu ms  Reception # : %lu\r\n", elapsed,my_msg.sqnumber);
+    boUART_puts(buffer);
 
   
     /* Execute a delay between ranging exchanges. */

@@ -113,8 +113,8 @@ static void led_toggle_timer_callback (void * pvParameter)
 {
   UNUSED_PARAMETER(pvParameter);
   LEDS_INVERT(BSP_LED_1_MASK);
-  boUART_puts(DW1000_DEVICE_DRIVER_VER_STRING);
-  boUART_puts("\r\n");
+  //boUART_puts(DW1000_DEVICE_DRIVER_VER_STRING);
+  //boUART_puts("\r\n");
 }
 #else
 
@@ -183,8 +183,9 @@ int main(void)
   /* Set expected response's delay and timeout. 
   * As this example only handles one incoming frame with always the same delay and timeout, those values can be set here once for all. */
   dwt_setrxaftertxdelay(POLL_TX_TO_RESP_RX_DLY_UUS);
-  dwt_setrxtimeout(65000); // Maximum value timeout with DW1000 is 65ms  
-  
+  //dwt_setrxtimeout(65000); // Maximum value timeout with DW1000 is 65ms  
+  dwt_setrxtimeout(0); // 타임아웃 기능 꺼짐 (무제한 RX) 
+
 
   //-------------dw1000  ini------end---------------------------	
   // IF WE GET HERE THEN THE LEDS WILL BLINK

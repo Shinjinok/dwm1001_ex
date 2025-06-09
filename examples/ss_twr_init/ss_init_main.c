@@ -198,6 +198,12 @@ int ss_init_run(void)
       //boUART_puts(buffer);
        
     /* Reset RX to properly reinitialise LDE operation. */
+
+    start = xTaskGetTickCount();
+       elapsed = start - end;
+      end = start;
+    sprintf(buffer,"Elapsed time: %lu ms  Reception # : %lu\r\n", elapsed,my_msg.sqnumber);
+    boUART_puts(buffer);
     }
   }
   else
@@ -207,11 +213,7 @@ int ss_init_run(void)
     
     dwt_rxreset();
   }
-start = xTaskGetTickCount();
-       elapsed = start - end;
-      end = start;
-    sprintf(buffer,"Elapsed time: %lu ms  Reception # : %lu\r\n", elapsed,my_msg.sqnumber);
-    boUART_puts(buffer);
+  
 
   
     /* Execute a delay between ranging exchanges. */

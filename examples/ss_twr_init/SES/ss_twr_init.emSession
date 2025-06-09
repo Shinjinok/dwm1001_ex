@@ -79,10 +79,12 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="156" useTextEdit="1" path="../main.c" left="0" selected="1" top="156" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="122" y="143" useTextEdit="1" path="../../ss_twr_resp/ss_resp_main.c" left="0" top="141" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="8" y="77" useTextEdit="1" path="../../../deca_driver/deca_device_api.h" left="0" top="60" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="2663" useTextEdit="1" path="../../../nRF5_SDK_14.2.0/external/freertos/source/tasks.c" left="0" top="2651" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="14" y="260" useTextEdit="1" path="../ss_init_main.c" left="0" selected="1" top="237" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="127" useTextEdit="1" path="../main.c" left="0" top="108" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="395" useTextEdit="1" path="../../../nRF5_SDK_14.2.0/components/drivers_nrf/spi_master/nrf_drv_spi.c" left="0" top="376" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="44" y="268" useTextEdit="1" path="../../../deca_driver/deca_regs.h" left="0" top="249" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="2999" useTextEdit="1" path="../../../nRF5_SDK_14.2.0/external/freertos/source/tasks.c" left="0" top="2980" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" path="../../../nRF5_SDK_14.2.0/external/freertos/config/FreeRTOSConfig.h" left="0" top="71" codecName="Default"/>
  </Files>
  <EMStudioWindow activeProject="ss_twr_init" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="nrf52832_xxaa" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="/home/sjo/dwm1001-examples/examples/ss_twr_resp" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

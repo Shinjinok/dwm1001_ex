@@ -34,7 +34,7 @@
 #include "deca_param_types.h"
 #include "deca_regs.h"
 #include "deca_device_api.h"
-#include "uart.h"
+#include "UART.h"
 #include "ss_init_main.h"
 #include "nrf_drv_gpiote.h"
 	
@@ -61,7 +61,7 @@ static dwt_config_t config = {
 #define POLL_TX_TO_RESP_RX_DLY_UUS 100 
 
 /*Should be accurately calculated during calibration*/
-#define TX_ANT_DLY 16300
+//#define TX_ANT_DLY 16300
 #define RX_ANT_DLY 16456	
 
 //--------------dw1000---end---------------
@@ -77,6 +77,8 @@ extern void ss_initiator_task_function (void * pvParameter);
 TaskHandle_t  led_toggle_task_handle;   /**< Reference to LED0 toggling FreeRTOS task. */
 TimerHandle_t led_toggle_timer_handle;  /**< Reference to LED1 toggling FreeRTOS timer. */
 #endif
+
+void vInterruptInit(void);
 
 #ifdef USE_FREERTOS
 
@@ -139,8 +141,9 @@ int main(void)
 	
   /*Initialization UART*/
   boUART_Init ();
-  printf("Singled Sided Two Way Ranging Initiator with Interrupt Example \r\n");
-	
+  char uartmsg[100];
+  sprintf(uartmsg,"One Way Ranging Tag\r\n");
+  bool ret = boUART_puts((const char *) &uartmsg);	
   /* Reset DW1000 */
   reset_DW1000(); 
 
@@ -177,11 +180,12 @@ int main(void)
   /* Set expected response's delay and timeout. 
   * As this example only handles one incoming frame with always the same delay and timeout, those values can be set here once for all. */
   dwt_setrxaftertxdelay(POLL_TX_TO_RESP_RX_DLY_UUS);
-  dwt_setrxtimeout(65000); // Maximum value timeout with DW1000 is 65ms  
-
+  dwt_setrxtimeout(0); // Maximum value timeout with DW1000 is 65ms  
+  dwt_rxenable(DWT_START_RX_IMMEDIATE);
   //-------------dw1000  ini------end---------------------------	
   // IF WE GET HERE THEN THE LEDS WILL BLINK
-
+ /* Activate reception immediately. */
+  
   #ifdef USE_FREERTOS		
     /* Start FreeRTOS scheduler. */
     vTaskStartScheduler();	
@@ -216,8 +220,8 @@ void vInterruptInit (void)
 {
   ret_code_t err_code;
 
-  if (nrf_drv_gpiote_is_init())
-    printf("nrf_drv_gpiote_init already installed\n");
+  if (nrf_drv_gpiote_is_init()){}
+    //printf("nrf_drv_gpiote_init already installed\n");
   else
     nrf_drv_gpiote_init();
 

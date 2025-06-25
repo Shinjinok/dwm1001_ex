@@ -71,7 +71,26 @@ bool boUART_getc(uint8_t *u8ch)
 	
 	return boSuccess;
 }
-
+bool boUART_putc(uint8_t u8ch)
+{
+	bool boSuccess = false;
+	
+	if (app_uart_put(u8ch) == NRF_SUCCESS)
+		boSuccess = true;
+	
+	return boSuccess;
+}
+bool boUART_puts(const char *str)
+{
+    while (*str)
+    {
+        if (!boUART_putc((uint8_t)*str++))
+        {
+            return false;  // 전송 실패 시 중단
+        }
+    }
+    return true;  // 모두 성공
+}
 static void vUartErrorHandle(app_uart_evt_t * p_event)
 {
     if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR)

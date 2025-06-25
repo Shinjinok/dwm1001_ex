@@ -31,7 +31,7 @@
 #define APP_NAME "SS TWR INIT v1.3"
 
 /* Inter-ranging delay period, in milliseconds. */
-#define RNG_DELAY_MS 5
+#define RNG_DELAY_MS 1
 
 /* Frames used in the ranging process. See NOTE 1,2 below. */
 static uint8 rx_blink_msg[] = { 0xc5,0x00,0x00, 0x05, 0x00, 0x10, 0x00, 0x01, 0xCA, 0xDE};
@@ -68,6 +68,7 @@ static double distance;
 
 /* Declaration of static functions. */
 static void resp_msg_get_ts(uint8 *ts_field, uint32 *ts);
+static uint64 id_counter[3];
 
 
 /*Transactions Counters */
@@ -97,7 +98,19 @@ blink_msg_t my_msg= {0xccbbaac5, 0,0,0, 0,0,0,0,0};
 * @return none
 */
  TickType_t end,start,elapsed;
-
+static uint64 get_rx_timestamp_u64(void)
+{
+  uint8 ts_tab[5];
+  uint64 ts = 0;
+  int i;
+  dwt_readrxtimestamp(ts_tab);
+  for (i = 4; i >= 0; i--)
+  {
+    ts <<= 8;
+    ts |= ts_tab[i];
+  }
+  return ts;
+}
 int ss_init_run(void)
 {
 
@@ -107,43 +120,10 @@ int ss_init_run(void)
  
  /* Activate reception immediately. */
   dwt_rxenable(DWT_START_RX_IMMEDIATE);
-  
-
-  /* Write frame data to DW1000 and prepare transmission. See NOTE 3 below. */
- // tx_poll_msg[ALL_MSG_SN_IDX] = frame_seq_nb;
- // dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_TXFRS);
- // dwt_writetxdata(sizeof(tx_poll_msg), tx_poll_msg, 0); /* Zero offset in TX buffer. */
- // dwt_writetxfctrl(sizeof(tx_poll_msg), 0, 1); /* Zero offset in TX buffer, ranging. */
-  //my_msg.sqnumber = frame_seq_nb;
-  //dwt_write32bitreg(SYS_STATUS_ID, SYS_STATUS_TXFRS);
-  //dwt_writetxdata(sizeof(my_msg), (uint8 *) &my_msg, 0); /* Zero offset in TX buffer. */
-  //dwt_writetxfctrl(sizeof(my_msg), 0, 1); /* Zero offset in TX buffer, ranging. */
-
-
-  ///* Start transmission, indicating that a response is expected so that reception is enabled automatically after the frame is sent and the delay
-  //* set by dwt_setrxaftertxdelay() has elapsed. */
-  //dwt_starttx(DWT_START_TX_IMMEDIATE | DWT_RESPONSE_EXPECTED);
-  //tx_count++;
-  //sprintf(buffer,"Transmission # : %d\r\n",tx_count);
-  //boUART_puts(buffer);
-
 
   ///* We assume that the transmission is achieved correctly, poll for reception of a frame or error/timeout. See NOTE 4 below. */
   while (!((status_reg = dwt_read32bitreg(SYS_STATUS_ID)) & (SYS_STATUS_RXFCG | SYS_STATUS_ALL_RX_TO | SYS_STATUS_ALL_RX_ERR)))
   {};
-
-  //  #if 0  // include if required to help debug timeouts.
-  //  int temp = 0;		
-  //  if(status_reg & SYS_STATUS_RXFCG )
-  //  temp =1;
-  //  else if(status_reg & SYS_STATUS_ALL_RX_TO )
-  //  temp =2;
-  //  if(status_reg & SYS_STATUS_ALL_RX_ERR )
-  //  temp =3;
-  //  #endif
-
-  ///* Increment frame sequence number after transmission of the poll message (modulo 256). */
-  //frame_seq_nb++;
 
   if (status_reg & SYS_STATUS_RXFCG)
   {		
@@ -167,14 +147,7 @@ int ss_init_run(void)
     if (memcmp(rx_buffer, (void *) &my_msg, 4) == 0)
     {
       memcpy((void *) &my_msg,(const void *) &rx_buffer, sizeof(my_msg));	
-      
-            //uint32 poll_tx_ts, resp_rx_ts, poll_rx_ts, resp_tx_ts;
-      //int32 rtd_init, rtd_resp;
-      //float clockOffsetRatio ;
-
-      ///* Retrieve poll transmission and response reception timestamps. See NOTE 5 below. */
-      //poll_tx_ts = dwt_readtxtimestamplo32();
-      //resp_rx_ts = dwt_readrxtimestamplo32();
+      uint64 poll_rx_ts = get_rx_timestamp_u64();
 
       ///* Read carrier integrator value and calculate clock offset ratio. See NOTE 7 below. */
       //clockOffsetRatio = dwt_readcarrierintegrator() * (FREQ_OFFSET_MULTIPLIER * HERTZ_TO_PPM_MULTIPLIER_CHAN_5 / 1.0e6) ;
@@ -204,8 +177,20 @@ int ss_init_run(void)
     start = xTaskGetTickCount();
        elapsed = start - end;
       end = start;
-    sprintf(buffer,"Elapsed time: %lu ms  Reception # : %lu\r\n", elapsed,my_msg.sqnumber);
+    sprintf(buffer,"Elapsed time: %lu ms  Reception # : %llu\r\n", poll_rx_ts,my_msg.anchor_id);
     boUART_puts(buffer);
+
+      if(my_msg.anchor_id == 3) {
+        id_counter[2] = poll_rx_ts;
+        sprintf(buffer,"Elapsed time: %llu %llu \r\n",id_counter[2]-id_counter[1],id_counter[1]-id_counter[0]);
+        boUART_puts(buffer);
+      }
+      else if(my_msg.anchor_id == 2){
+        id_counter[1] = poll_rx_ts;
+      }
+      else{
+        id_counter[0] = poll_rx_ts;
+      }
     }
   }
   else

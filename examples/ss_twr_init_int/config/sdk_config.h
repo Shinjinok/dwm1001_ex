@@ -46,8 +46,11 @@
 #endif
 
 
-#define USE_FREERTOS	// define to use RTOS in this example code. Comment if FREERTOS is not necessary
-
+//#define USE_FREERTOS	// define to use RTOS in this example code. Comment if FREERTOS is not necessary
+#define NRF_SDH_BLE_ENABLED 1
+#define NRF_BLE_GATT_ENABLED 1
+#define NRF_BLE_QWR_ENABLED 1
+#define BLE_ADVERTISING_ENABLED 1
 
 // <h> Board Support 
 

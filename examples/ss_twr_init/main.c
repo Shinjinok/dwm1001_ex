@@ -171,7 +171,7 @@ int main(void)
   /* Configure DW1000. */
   dwt_configure(&config);
   //dwt_setsmarttxpower(true);
-  read_tx_power_decadriver();
+  //read_tx_power_decadriver();
 
   /* Apply default antenna delay value. See NOTE 2 below. */
   dwt_setrxantennadelay(RX_ANT_DLY);

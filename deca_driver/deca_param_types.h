@@ -16,6 +16,7 @@
 extern "C" {
 #endif
 #include "deca_types.h"
+#include <stdint.h>
 
 #define NUM_BR 3
 #define NUM_PRF 2
@@ -26,7 +27,24 @@ extern "C" {
 #define NUM_CH_SUPPORTED 8  //supported channels are '0', 1, 2, 3, 4, 5, '6', 7
 #define PCODES 25           //supported preamble codes
 
+typedef struct blink_msg{
+	uint32 header;
+	uint32 anchor_id;
+	uint32 sqnumber;
+        int32  anchor_x;   
+	int32 anchor_y;
+	int32 anchor_z;
+	uint32 tx_delay;
+	uint32 sync_delay;
+        uint16 check;
+}blink_msg_t;
+typedef struct rcv_msg{
+	blink_msg_t get_msg;
+	uint64_t rx_timestamp;
+}rcv_msg_t;
 
+extern rcv_msg_t my_msg[20];
+extern int rcv_count;
 typedef struct {
     uint32 lo32;
     uint16 target[NUM_PRF];

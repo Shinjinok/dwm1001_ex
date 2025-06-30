@@ -10,7 +10,7 @@
  *
  * @author DecaWave
  */
-
+#include "dw1001_dev.h"
 #include "port_platform.h"
 #include "deca_device_api.h"
 

@@ -17,7 +17,7 @@
 #include "deca_param_types.h"
 #include "deca_regs.h"
 #include "deca_device_api.h"
-#include "UART.h"
+//#include "UART.h"
 #include <stdio.h>
 // Defines for enable_clocks function
 #define FORCE_SYS_XTI  0

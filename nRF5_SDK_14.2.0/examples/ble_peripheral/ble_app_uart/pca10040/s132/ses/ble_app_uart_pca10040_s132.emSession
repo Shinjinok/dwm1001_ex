@@ -31,6 +31,7 @@
   <ProjectSessionItem path="ble_app_uart_pca10040_s132;ble_app_uart_pca10040_s132;nRF_BLE"/>
   <ProjectSessionItem path="ble_app_uart_pca10040_s132;ble_app_uart_pca10040_s132;nRF_BLE_Services"/>
   <ProjectSessionItem path="ble_app_uart_pca10040_s132;ble_app_uart_pca10040_s132;nRF_Drivers"/>
+  <ProjectSessionItem path="ble_app_uart_pca10040_s132;ble_app_uart_pca10040_s132;nRF_Libraries"/>
   <ProjectSessionItem path="ble_app_uart_pca10040_s132;ble_app_uart_pca10040_s132;nRF_Log"/>
   <ProjectSessionItem path="ble_app_uart_pca10040_s132;ble_app_uart_pca10040_s132;nRF_Segger_RTT"/>
   <ProjectSessionItem path="ble_app_uart_pca10040_s132;ble_app_uart_pca10040_s132;nRF_SoftDevice"/>
@@ -67,11 +68,12 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="9" y="67" useTextEdit="1" path="../../../main.c" left="0" top="67" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="544" useTextEdit="1" path="ss_init_main.c" left="0" selected="1" top="512" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" path="../../../../../../components/drivers_nrf/uart/nrf_drv_uart.h" left="0" top="48" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" path="../../../../../../components/drivers_nrf/hal/nrf_uart.h" left="0" top="516" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="21" y="236" useTextEdit="1" path="../../../../../../components/libraries/uart/app_uart.h" left="0" top="211" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="123" useTextEdit="1" path="ble_init_main.c" left="0" top="103" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="101" useTextEdit="1" path="ss_init_main.c" left="0" top="87" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="11" useTextEdit="1" path="../../../main.c" left="0" selected="1" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="9" y="312" useTextEdit="1" path="../../../../../../components/ble/ble_services/ble_nus/ble_nus.c" left="0" top="296" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="96" useTextEdit="1" path="../../../../../../components/libraries/util/app_error_weak.c" left="0" top="68" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="9" y="219" useTextEdit="1" path="../../../../../../components/libraries/uart/app_uart_fifo.c" left="0" top="198" codecName="Default"/>
  </Files>
- <EMStudioWindow activeProject="ble_app_uart_pca10040_s132" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="/home/sjo/dwm1001-examples/examples/ss_twr_resp" debugSearchPath="" autoConnectCapabilities="3199"/>
+ <EMStudioWindow activeProject="ble_app_uart_pca10040_s132" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="/home/sjo/dwm1001-examples/nRF5_SDK_14.2.0/examples/ble_peripheral/ble_app_uart/pca10040/s132/ses" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>

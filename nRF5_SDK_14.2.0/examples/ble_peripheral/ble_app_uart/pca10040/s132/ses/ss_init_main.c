@@ -58,6 +58,8 @@
 #include "port_platform.h"
 //#include "ss_init_main.h"
 //#include "UART.h"
+#include "tdoa.h"
+
 
 #define APP_NAME "SS TWR INIT v1.3"
 
@@ -99,9 +101,6 @@ static dwt_config_t config = {
 
 
 
-/* Frames used in the ranging process. See NOTE 1,2 below. */
-static uint8 tx_poll_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'W', 'A', 'V', 'E', 0xE0, 0, 0};
-static uint8 rx_resp_msg[] = {0x41, 0x88, 0, 0xCA, 0xDE, 'V', 'E', 'W', 'A', 0xE1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 /* Length of the common part of the message (up to and including the function code, see NOTE 1 below). */
 #define ALL_MSG_COMMON_LEN 10
 /* Indexes to access some of the fields in the frames defined above. */
@@ -162,109 +161,52 @@ bool time_out_sig = false;
 *
 * @return none
 */
+extern int send_to_ble(const char * str);
 
-static bool boUART_puts(const char *str)
-{
-    while (*str)
-    {
-        if (app_uart_put((uint8_t)*str++))
-        {
-            return false;  // 전송 실패 시 중단
-        }
-    }
-    return true;  // 모두 성공
-}
+extern bool send_to_UART(char *str);
 
 
 int ss_init_run(void)
 {
-/* Execute a delay between ranging exchanges. */
-    int delta[10];
-
+  /* Execute a delay between ranging exchanges. */
+    
+    
      if(msg_updated) {
-        for(int i=0;i<rcv_msg_count-1;i++){
-          delta[i] = my_msg[i+1].rx_timestamp - my_msg[i].rx_timestamp - (my_msg[i+1].get_msg.tx_delay - my_msg[i].get_msg.tx_delay)*256 ;
-          //char uartmsg[50];
-          printf("delta[%d]= %d\r\n",i,delta[i]);
-          //bool ret = boUART_puts((const char *) &uartmsg);
+        for(int i=0;i<rcv_msg_count;i++){
+          char tmp[50];
+          sprintf(tmp,"Aid %d, Ts %llu\r\n", my_msg[i].get_msg.anchor_id, my_msg[i].rx_timestamp);
+      
+          send_to_ble(tmp);
+          send_to_UART(tmp);
         }
+        int delta[10];
+        for(int i=0;i<rcv_msg_count-1;i++){
+          
+          delta[i] = my_msg[i+1].rx_timestamp - my_msg[i].rx_timestamp - \
+                    (my_msg[i+1].get_msg.tx_delay - my_msg[i].get_msg.tx_delay)*256 ;
+          char tmp[50];
+          sprintf(tmp,"delta[%d]= %d\r\n",i,delta[i]);
+          send_to_ble(tmp);
+          send_to_UART(tmp);
+        }
+        tdoa_data_t data;
+        
+        for(int i=0;i < rcv_msg_count;i++){
+           data.anchor[i].x =  my_msg[i].get_msg.anchor_x;
+           data.anchor[i].y =  my_msg[i].get_msg.anchor_y;
+           data.anchor[i].z =  my_msg[i].get_msg.anchor_z;
+           data.tdoa[i] = delta[i];
+        }
+        tag_pos_t tag_pos = pos_cal(rcv_msg_count, data);
+
+
         msg_updated = false;
      }
      deca_sleep(RNG_DELAY_MS);
      return(1);
 }
 
-  /* Loop forever initiating ranging exchanges. */
- /* Activate reception immediately. */
- // dwt_rxenable(DWT_START_RX_IMMEDIATE);
-  /* Wait for reception, timeout or error interrupt flag*/
-  //while (!(rx_int_flag || to_int_flag|| er_int_flag))
-  //{};
-
-  /* Increment frame sequence number after transmission of the poll message (modulo 256). */
-  //frame_seq_nb++;
-
-  //if (rx_int_flag)
-  //{		
-  //  uint32 frame_len;
-
-  //  /* A frame has been received, read it into the local buffer. */
-  //  frame_len = dwt_read32bitreg(RX_FINFO_ID) & RX_FINFO_RXFLEN_MASK;
-  //  if (frame_len <= RX_BUF_LEN)
-  //  {
-  //    dwt_readrxdata(rx_buffer, frame_len, 0);
-  //  }
-
-  //  /* Check that the frame is the expected response from the companion "SS TWR responder" example.
-  //  * As the sequence number field of the frame is not relevant, it is cleared to simplify the validation of the frame. */
-  //  //rx_buffer[ALL_MSG_SN_IDX] = 0;
-  //  if (memcmp(rx_buffer, (const void *) &header, 4) == 0)
-  //  {	
-  //    rx_count++;
-  //    printf("Reception # : %d\r\n",rx_count);
-  //    float reception_rate = (float) rx_count / (float) tx_count * 100;
-  //    printf("Reception rate # : %f\r\n",reception_rate);
-  //    uint32 poll_tx_ts, resp_rx_ts, poll_rx_ts, resp_tx_ts;
-  //    int32 rtd_init, rtd_resp;
-  //    float clockOffsetRatio ;
-
-  //    /* Retrieve poll transmission and response reception timestamps. See NOTE 4 below. */
-  //    poll_tx_ts = dwt_readtxtimestamplo32();
-  //    resp_rx_ts = dwt_readrxtimestamplo32();
-
-  //    /* Read carrier integrator value and calculate clock offset ratio. See NOTE 6 below. */
-  //    clockOffsetRatio = dwt_readcarrierintegrator() * (FREQ_OFFSET_MULTIPLIER * HERTZ_TO_PPM_MULTIPLIER_CHAN_5 / 1.0e6) ;
-
-  //    /* Get timestamps embedded in response message. */
-  //    resp_msg_get_ts(&rx_buffer[RESP_MSG_POLL_RX_TS_IDX], &poll_rx_ts);
-  //    resp_msg_get_ts(&rx_buffer[RESP_MSG_RESP_TX_TS_IDX], &resp_tx_ts);
-
-  //    /* Compute time of flight and distance, using clock offset ratio to correct for differing local and remote clock rates */
-  //    rtd_init = resp_rx_ts - poll_tx_ts;
-  //    rtd_resp = resp_tx_ts - poll_rx_ts;
-
-  //    tof = ((rtd_init - rtd_resp * (1.0f - clockOffsetRatio)) / 2.0f) * DWT_TIME_UNITS; // Specifying 1.0f and 2.0f are floats to clear warning 
-  //    distance = tof * SPEED_OF_LIGHT;
-  //    printf("Distance : %f\r\n",distance);
-
-  //    /*Reseting receive interrupt flag*/
-  //    rx_int_flag = 0; 
-  //  }
-  // }
-
-  //if (to_int_flag || er_int_flag)
-  //{
-  //  /* Reset RX to properly reinitialise LDE operation. */
-  //  dwt_rxreset();
-
-  //  /*Reseting interrupt flag*/
-  //  to_int_flag = 0 ;
-  //  er_int_flag = 0 ;
-  //}
-
-    /* Execute a delay between ranging exchanges. */
-    //     deca_sleep(RNG_DELAY_MS);
-    //	return(1);
+  
 
 
 /*! ------------------------------------------------------------------------------------------------------------------
@@ -304,7 +246,7 @@ void rx_ok_cb(const dwt_cb_data_t *cb_data)
 {
   rx_int_flag = 1 ;
   
-
+  char tmp[100];
  
  
   //  /* A frame has been received, read it into the local buffer. */
@@ -318,15 +260,9 @@ void rx_ok_cb(const dwt_cb_data_t *cb_data)
    dwt_rxenable(DWT_START_RX_IMMEDIATE);
    printf("dwt_setrxtimeout(1000)\r\n");
 
-
   if (memcmp(rx_buffer,(const void *) &header, 4) == 0){
-
       memcpy((void *) &my_msg[rcv_count].get_msg,(const void *) &rx_buffer, sizeof(blink_msg_t));
       my_msg[rcv_count].rx_timestamp = get_rx_timestamp_u64();
-
-      printf("rc %d Tstamp %llu ID %d SQN %lu\r\n",rcv_count,my_msg[rcv_count].rx_timestamp
-      ,my_msg[rcv_count].get_msg.anchor_id, my_msg[rcv_count].get_msg.sqnumber);
-
       rcv_count++;
       if(rcv_count > 19) rcv_count = 0;
   }
@@ -370,7 +306,7 @@ void rx_err_cb(const dwt_cb_data_t *cb_data)
   /* TESTING BREAKPOINT LOCATION #3 */
   char uartmsg[20];
    sprintf(uartmsg,"rx_err_cb\r\n");
-   bool ret = boUART_puts((const char *) &uartmsg);
+   bool ret = send_to_UART(uartmsg);
    dwt_rxenable(DWT_START_RX_IMMEDIATE);
 }
 
@@ -474,7 +410,35 @@ static void resp_msg_get_ts(uint8 *ts_field, uint32 *ts)
 *     As stated in NOTE 2 a fixed offset in range will be seen unless the antenna delsy is calibratred and set correctly.
 *
 ****************************************************************************************************************************************************/
-void vInterruptInit(void);
+
+void vInterruptHandler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+{
+  dwt_isr(); // DW1000 interrupt service routine 
+}
+/*!
+* @brief Configure an IO pin as a positive edge triggered interrupt source.
+*/
+void vInterruptInit (void)
+{
+  ret_code_t err_code;
+
+  if (nrf_drv_gpiote_is_init()){
+    printf("nrf_drv_gpiote_init already installed\n");
+    }
+  else{
+    nrf_drv_gpiote_init();
+  }
+  // input pin, +ve edge interrupt, no pull-up
+  nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_LOTOHI(true);
+  in_config.pull = NRF_GPIO_PIN_NOPULL;
+
+  // Link this pin interrupt source to its interrupt handler
+  err_code = nrf_drv_gpiote_in_init(DW1000_IRQ, &in_config, vInterruptHandler);
+  APP_ERROR_CHECK(err_code);
+
+  nrf_drv_gpiote_in_event_enable(DW1000_IRQ, true);
+}
+
 void dw1000_init(void)
 {
 
@@ -486,7 +450,7 @@ void dw1000_init(void)
 
   char uartmsg[100];
   sprintf(uartmsg,"One Way Ranging Tag\r\n");
-  bool ret = boUART_puts((const char *) &uartmsg);	
+  bool ret = send_to_UART(uartmsg);	
   /* Reset DW1000 */
   reset_DW1000(); 
 
@@ -528,29 +492,75 @@ void dw1000_init(void)
   //-------------dw1000  ini------end---------------------------	
 
 }
-void vInterruptHandler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
-{
-  dwt_isr(); // DW1000 interrupt service routine 
-}
-/*!
-* @brief Configure an IO pin as a positive edge triggered interrupt source.
-*/
-void vInterruptInit (void)
-{
-  ret_code_t err_code;
 
-  if (nrf_drv_gpiote_is_init()){}
-    //printf("nrf_drv_gpiote_init already installed\n");
-  else
-    nrf_drv_gpiote_init();
+/* Loop forever initiating ranging exchanges. */
+ /* Activate reception immediately. */
+ // dwt_rxenable(DWT_START_RX_IMMEDIATE);
+  /* Wait for reception, timeout or error interrupt flag*/
+  //while (!(rx_int_flag || to_int_flag|| er_int_flag))
+  //{};
 
-  // input pin, +ve edge interrupt, no pull-up
-  nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_LOTOHI(true);
-  in_config.pull = NRF_GPIO_PIN_NOPULL;
+  /* Increment frame sequence number after transmission of the poll message (modulo 256). */
+  //frame_seq_nb++;
 
-  // Link this pin interrupt source to its interrupt handler
-  err_code = nrf_drv_gpiote_in_init(DW1000_IRQ, &in_config, vInterruptHandler);
-  APP_ERROR_CHECK(err_code);
+  //if (rx_int_flag)
+  //{		
+  //  uint32 frame_len;
 
-  nrf_drv_gpiote_in_event_enable(DW1000_IRQ, true);
-}
+  //  /* A frame has been received, read it into the local buffer. */
+  //  frame_len = dwt_read32bitreg(RX_FINFO_ID) & RX_FINFO_RXFLEN_MASK;
+  //  if (frame_len <= RX_BUF_LEN)
+  //  {
+  //    dwt_readrxdata(rx_buffer, frame_len, 0);
+  //  }
+
+  //  /* Check that the frame is the expected response from the companion "SS TWR responder" example.
+  //  * As the sequence number field of the frame is not relevant, it is cleared to simplify the validation of the frame. */
+  //  //rx_buffer[ALL_MSG_SN_IDX] = 0;
+  //  if (memcmp(rx_buffer, (const void *) &header, 4) == 0)
+  //  {	
+  //    rx_count++;
+  //    printf("Reception # : %d\r\n",rx_count);
+  //    float reception_rate = (float) rx_count / (float) tx_count * 100;
+  //    printf("Reception rate # : %f\r\n",reception_rate);
+  //    uint32 poll_tx_ts, resp_rx_ts, poll_rx_ts, resp_tx_ts;
+  //    int32 rtd_init, rtd_resp;
+  //    float clockOffsetRatio ;
+
+  //    /* Retrieve poll transmission and response reception timestamps. See NOTE 4 below. */
+  //    poll_tx_ts = dwt_readtxtimestamplo32();
+  //    resp_rx_ts = dwt_readrxtimestamplo32();
+
+  //    /* Read carrier integrator value and calculate clock offset ratio. See NOTE 6 below. */
+  //    clockOffsetRatio = dwt_readcarrierintegrator() * (FREQ_OFFSET_MULTIPLIER * HERTZ_TO_PPM_MULTIPLIER_CHAN_5 / 1.0e6) ;
+
+  //    /* Get timestamps embedded in response message. */
+  //    resp_msg_get_ts(&rx_buffer[RESP_MSG_POLL_RX_TS_IDX], &poll_rx_ts);
+  //    resp_msg_get_ts(&rx_buffer[RESP_MSG_RESP_TX_TS_IDX], &resp_tx_ts);
+
+  //    /* Compute time of flight and distance, using clock offset ratio to correct for differing local and remote clock rates */
+  //    rtd_init = resp_rx_ts - poll_tx_ts;
+  //    rtd_resp = resp_tx_ts - poll_rx_ts;
+
+  //    tof = ((rtd_init - rtd_resp * (1.0f - clockOffsetRatio)) / 2.0f) * DWT_TIME_UNITS; // Specifying 1.0f and 2.0f are floats to clear warning 
+  //    distance = tof * SPEED_OF_LIGHT;
+  //    printf("Distance : %f\r\n",distance);
+
+  //    /*Reseting receive interrupt flag*/
+  //    rx_int_flag = 0; 
+  //  }
+  // }
+
+  //if (to_int_flag || er_int_flag)
+  //{
+  //  /* Reset RX to properly reinitialise LDE operation. */
+  //  dwt_rxreset();
+
+  //  /*Reseting interrupt flag*/
+  //  to_int_flag = 0 ;
+  //  er_int_flag = 0 ;
+  //}
+
+    /* Execute a delay between ranging exchanges. */
+    //     deca_sleep(RNG_DELAY_MS);
+    //	return(1);

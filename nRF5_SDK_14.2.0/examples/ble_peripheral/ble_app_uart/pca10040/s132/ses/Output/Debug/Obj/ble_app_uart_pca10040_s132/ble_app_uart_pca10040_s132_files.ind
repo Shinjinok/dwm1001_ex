@@ -1,5 +1,7 @@
+"Output/Debug/Obj/ble_app_uart_pca10040_s132/ble_init_main.o"
 "Output/Debug/Obj/ble_app_uart_pca10040_s132/main.o"
 "Output/Debug/Obj/ble_app_uart_pca10040_s132/ss_init_main.o"
+"Output/Debug/Obj/ble_app_uart_pca10040_s132/tdoa.o"
 "Output/Debug/Obj/ble_app_uart_pca10040_s132/boards.o"
 "Output/Debug/Obj/ble_app_uart_pca10040_s132/bsp.o"
 "Output/Debug/Obj/ble_app_uart_pca10040_s132/bsp_btn_ble.o"

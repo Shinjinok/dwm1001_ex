@@ -73,7 +73,7 @@ Revision: $Rev: 4351 $
 #include <stdio.h>
 #include "limits.h"
 #include "__libc.h"
-#include "__vfprintf.h"
+//#include "__vfprintf.h"
 
 /*********************************************************************
 *
@@ -242,7 +242,7 @@ int puts(const char *s) {
 *  Function description
 *    Write one character via RTT.
 */
-int __putchar(int x, __printf_tag_ptr ctx) {
+int __putchar(int x, void * ctx) {
   (void)ctx;
   SEGGER_RTT_Write(0, (char *)&x, 1);
   return x;

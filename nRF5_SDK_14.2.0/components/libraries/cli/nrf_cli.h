@@ -40,6 +40,7 @@
 #ifndef NRF_CLI_H__
 #define NRF_CLI_H__
 
+#include "sdk_config.h"
 #include "sdk_common.h"
 #include "nrf_cli_types.h"
 #include "nrf_section.h"

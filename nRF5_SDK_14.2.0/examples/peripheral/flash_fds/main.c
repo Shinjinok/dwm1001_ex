@@ -277,7 +277,7 @@ int main(void)
     log_init();
     cli_init();
 
-    NRF_LOG_INFO("fds example started!")
+    NRF_LOG_INFO("fds example started!");
 
     /* Register first to receive an event when initialization is complete. */
     (void) fds_register(fds_evt_handler);

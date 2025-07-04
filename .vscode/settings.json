@@ -3,6 +3,8 @@
         "deca_types.h": "c",
         "deca_param_types.h": "c",
         "deca_device_api.h": "c",
-        "nrf_sdh_ble.h": "c"
+        "nrf_sdh_ble.h": "c",
+        "nrf_cli_uart.h": "c",
+        "nrf_ringbuf.h": "c"
     }
 }

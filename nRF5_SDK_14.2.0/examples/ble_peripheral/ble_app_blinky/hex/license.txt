@@ -1,3 +1,5 @@
 The provided HEX files were compiled using the projects located in the folders for the respective boards (pca10xxx).
 
 For license and copyright information, see the individual .c and .h files that are included in the projects.
+
+./nrfutil pkg generate --hw-version 52 --application-version 1 --application ble_app_blinky_pca10040_s132.hex --sd-req 0x9D --key-file private.key app_dfu_package.zip

@@ -57,6 +57,14 @@
       <file file_name="../../../../../../components/boards/boards.c" />
     </folder>
     <folder Name="Board Support">
+      <folder Name="nRF_BLE">
+        <file file_name="../../../../../../components/ble/common/ble_advdata.c" />
+        <file file_name="../../../../../../components/ble/ble_advertising/ble_advertising.c" />
+        <file file_name="../../../../../../components/ble/common/ble_conn_params.c" />
+        <file file_name="../../../../../../components/ble/common/ble_conn_state.c" />
+        <file file_name="../../../../../../components/ble/common/ble_srv_common.c" />
+        <file file_name="../../../../../../components/ble/nrf_ble_gatt/nrf_ble_gatt.c" />
+      </folder>
       <file file_name="../../../../../../components/libraries/bsp/bsp.c" />
       <file file_name="../../../../../../components/libraries/bsp/bsp_btn_ble.c" />
       <file file_name="../../../../../../components/libraries/bsp/bsp_nfc.c" />
@@ -70,14 +78,6 @@
       <file file_name="../../../../../../components/toolchain/ses/ses_nrf52_Vectors.s" />
       <file file_name="../../../../../../components/toolchain/ses/ses_nRF_Startup.s" />
       <file file_name="../../../../../../components/toolchain/system_nrf52.c" />
-    </folder>
-    <folder Name="nRF_BLE">
-      <file file_name="../../../../../../components/ble/common/ble_advdata.c" />
-      <file file_name="../../../../../../components/ble/ble_advertising/ble_advertising.c" />
-      <file file_name="../../../../../../components/ble/common/ble_conn_params.c" />
-      <file file_name="../../../../../../components/ble/common/ble_conn_state.c" />
-      <file file_name="../../../../../../components/ble/common/ble_srv_common.c" />
-      <file file_name="../../../../../../components/ble/nrf_ble_gatt/nrf_ble_gatt.c" />
     </folder>
     <folder Name="nRF_BLE_Services">
       <file file_name="../../../../../../components/ble/ble_services/ble_nus/ble_nus.c" />

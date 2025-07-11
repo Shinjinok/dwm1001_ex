@@ -76,6 +76,7 @@
 "Output/Debug/Obj/ble_app_cli_pca10040_s132/nrf_sdh_soc.o"
 "Output/Debug/Obj/ble_app_cli_pca10040_s132/thumb_crt0.o"
 "/opt/SEGGER/segger_embedded_studio_8.22a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi_balanced.a"
+"/opt/SEGGER/segger_embedded_studio_8.22a/lib/prinops_rtt_v7em_fpv4_sp_d16_hard_t_le_eabi_balanced.a"
 "/opt/SEGGER/segger_embedded_studio_8.22a/lib/heapops_basic_v7em_fpv4_sp_d16_hard_t_le_eabi_balanced.a"
 "/opt/SEGGER/segger_embedded_studio_8.22a/lib/heapops_disable_interrupts_locking_v7em_fpv4_sp_d16_hard_t_le_eabi_balanced.a"
 "/opt/SEGGER/segger_embedded_studio_8.22a/lib/strops_unaligned_v7em_fpv4_sp_d16_hard_t_le_eabi_balanced.a"

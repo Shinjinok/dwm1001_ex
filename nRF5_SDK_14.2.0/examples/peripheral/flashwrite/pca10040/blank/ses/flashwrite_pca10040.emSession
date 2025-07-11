@@ -59,15 +59,15 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="134" useTextEdit="1" path="../../../main.c" left="0" selected="1" top="277" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="167" useTextEdit="1" path="../../../main.c" left="0" selected="1" top="149" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="27" y="244" useTextEdit="1" path="../../../../../../external/segger_rtt/SEGGER_RTT_Syscalls_SES.c" left="0" top="223" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="8" y="143" useTextEdit="1" path="../config/sdk_config.h" left="0" top="192" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="8" y="143" useTextEdit="1" path="../config/sdk_config.h" left="0" top="143" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="108" useTextEdit="1" path="../../../../../../components/toolchain/cmsis/include/cmsis_gcc.h" left="0" top="88" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="247" useTextEdit="1" path="../../../../../../components/libraries/cli/uart/nrf_cli_uart.c" left="0" top="230" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="69" y="202" useTextEdit="1" path="../../../../../../components/drivers_nrf/uart/nrf_drv_uart.h" left="0" top="176" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="69" y="202" useTextEdit="1" path="../../../../../../components/drivers_nrf/uart/nrf_drv_uart.h" left="0" top="178" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" path="../../../../../../components/boards/boards.c" left="0" top="15" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="29" y="58" useTextEdit="1" path="../../../../../../components/boards/boards.h" left="0" top="45" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" path="../../../../../../components/libraries/cli/nrf_cli.c" left="0" top="0" codecName="Default"/>
  </Files>
- <EMStudioWindow activeProject="flashwrite_pca10040" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="/home/sjo/dwm1001-examples/nRF5_SDK_14.2.0/examples/ble_peripheral/ble_app_uart/pca10040/s132/ses" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <EMStudioWindow activeProject="flashwrite_pca10040" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="/home/sjo/dwm1001-examples/nRF5_SDK_14.2.0/examples/ble_peripheral/ble_app_uart/pca10040/s132/ses" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

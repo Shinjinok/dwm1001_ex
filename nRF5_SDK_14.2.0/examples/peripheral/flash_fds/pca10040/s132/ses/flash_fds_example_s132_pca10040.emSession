@@ -57,7 +57,7 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="266" useTextEdit="1" path="../../../main.c" left="0" selected="1" top="246" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="5" y="271" useTextEdit="1" path="../../../main.c" left="0" selected="1" top="174" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="13" y="86" useTextEdit="1" path="../../../cli.c" left="0" top="79" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="51" y="101" useTextEdit="1" path="../../../../../../components/libraries/cli/uart/nrf_cli_uart.h" left="0" top="77" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="30" y="299" useTextEdit="1" path="../../../../../../components/libraries/cli/uart/nrf_cli_uart.c" left="0" top="267" codecName="Default"/>

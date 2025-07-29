@@ -699,7 +699,7 @@ void ble_init(void)
     err_code = app_timer_init();
     APP_ERROR_CHECK(err_code);
 
-    uart_init();
+   // uart_init();
     
     log_init();
 
@@ -711,8 +711,8 @@ void ble_init(void)
     advertising_init();
     conn_params_init();
   
-    printf("\r\nUART Start!\r\n");
-    NRF_LOG_INFO("UART Start!");
+    //printf("\r\nUART Start!\r\n");
+   // NRF_LOG_INFO("UART Start!");
     err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
 }

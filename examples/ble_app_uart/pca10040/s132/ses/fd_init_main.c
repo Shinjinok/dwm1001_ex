@@ -268,13 +268,13 @@ void fd_init(void)
     ret_code_t rc;
 
 #ifdef SOFTDEVICE_PRESENT
-    ble_stack_init();
+   // ble_stack_init();
 #else
     clock_init();
 #endif
 
     timer_init();
-    log_init();
+   // log_init();
     cli_init();
 
     NRF_LOG_INFO("fds example started!");

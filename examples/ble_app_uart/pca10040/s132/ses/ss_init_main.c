@@ -163,7 +163,7 @@ bool time_out_sig = false;
 */
 extern int send_to_ble(const char * str);
 
-extern bool send_to_UART(char *str);
+//extern bool send_to_UART(char *str);
 
 
 int ss_init_run(void)
@@ -177,7 +177,7 @@ int ss_init_run(void)
           sprintf(tmp,"Aid %d, Ts %llu\r\n", my_msg[i].get_msg.anchor_id, my_msg[i].rx_timestamp);
       
           send_to_ble(tmp);
-          send_to_UART(tmp);
+       //   send_to_UART(tmp);
         }
         int delta[10];
         for(int i=0;i<rcv_msg_count-1;i++){
@@ -187,7 +187,7 @@ int ss_init_run(void)
           char tmp[50];
           sprintf(tmp,"delta[%d]= %d\r\n",i,delta[i]);
           send_to_ble(tmp);
-          send_to_UART(tmp);
+        //  send_to_UART(tmp);
         }
         tdoa_data_t data;
         
@@ -304,9 +304,9 @@ void rx_err_cb(const dwt_cb_data_t *cb_data)
 {
   er_int_flag = 1 ;
   /* TESTING BREAKPOINT LOCATION #3 */
-  char uartmsg[20];
-   sprintf(uartmsg,"rx_err_cb\r\n");
-   bool ret = send_to_UART(uartmsg);
+  //char uartmsg[20];
+  // sprintf(uartmsg,"rx_err_cb\r\n");
+  // bool ret = send_to_UART(uartmsg);
    dwt_rxenable(DWT_START_RX_IMMEDIATE);
 }
 
@@ -448,9 +448,9 @@ void dw1000_init(void)
 /* Setup NRF52832 interrupt on GPIO 25 : connected to DW1000 IRQ*/
   vInterruptInit();
 
-  char uartmsg[100];
-  sprintf(uartmsg,"One Way Ranging Tag\r\n");
-  bool ret = send_to_UART(uartmsg);	
+  //char uartmsg[100];
+  //sprintf(uartmsg,"One Way Ranging Tag\r\n");
+  //bool ret = send_to_UART(uartmsg);	
   /* Reset DW1000 */
   reset_DW1000(); 
 

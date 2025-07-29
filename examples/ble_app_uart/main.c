@@ -12,14 +12,14 @@ extern void fd_loop(void);
 int main(void)
 {
 
-    //ble_init();
-   // dw1000_init();
+    ble_init();
+    dw1000_init();
     fd_init();
     // Enter main loop.
     for (;;)
     {
-       // ble_run();
-       // int ret = ss_init_run();
+        ble_run();
+        int ret = ss_init_run();
         fd_loop();
     }
 }

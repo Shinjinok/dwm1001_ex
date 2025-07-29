@@ -59,14 +59,14 @@
 //#include "ss_init_main.h"
 //#include "UART.h"
 #include "tdoa.h"
-
+#include "default_config.h"
 
 #define APP_NAME "SS TWR INIT v1.3"
 
 /* Inter-ranging delay period, in milliseconds. */
 #define RNG_DELAY_MS 1
 
-
+//param_block_t default_config= DEFAULT_CONFIG;
 
 
 /*DW1000 config function*/
@@ -166,7 +166,7 @@ extern int send_to_ble(const char * str);
 //extern bool send_to_UART(char *str);
 
 
-int ss_init_run(void)
+void ss_init_run(void)
 {
   /* Execute a delay between ranging exchanges. */
     
@@ -203,7 +203,7 @@ int ss_init_run(void)
         msg_updated = false;
      }
      deca_sleep(RNG_DELAY_MS);
-     return(1);
+
 }
 
   

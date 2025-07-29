@@ -57,12 +57,13 @@
 #define NRF_LOG_MODULE_NAME app
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
-
+#include "default_config.h"
 
 /* A tag identifying the SoftDevice BLE configuration. */
 #define APP_BLE_CONN_CFG_TAG    1
 
-
+param_block_t current_config;
+param_block_t default_config = DEFAULT_CONFIG;
 /* Array to map FDS return values to strings. */
 char const * fds_err_str[] =
 {
@@ -314,7 +315,7 @@ void fd_init(void)
     fds_find_token_t  tok  = {0};
 
     rc = fds_record_find(CONFIG_FILE, CONFIG_REC_KEY, &desc, &tok);
-
+    
     if (rc == FDS_SUCCESS)
     {
         /* A config file is in flash. Let's update it. */
@@ -347,6 +348,23 @@ void fd_init(void)
 
         rc = fds_record_write(&desc, &m_dummy_record);
         APP_ERROR_CHECK(rc);
+    }
+
+    rc = fds_record_find(1, 1, &desc, &tok);
+    if (rc != FDS_SUCCESS)
+    {
+        fds_record_t defalut_config_record;
+        defalut_config_record.file_id =1;
+        defalut_config_record.key = 1;
+        defalut_config_record.data.p_data = &default_config;
+        defalut_config_record.data.length_words = sizeof(default_config)/4;
+        rc = fds_record_write(&desc, &defalut_config_record);
+        APP_ERROR_CHECK(rc);
+    }
+    else{
+        fds_flash_record_t data = {0};
+        rc = fds_record_open(&desc, &data);
+       memcpy(&current_config, data.p_data, sizeof(param_block_t)); 
     }
 
     cli_start();

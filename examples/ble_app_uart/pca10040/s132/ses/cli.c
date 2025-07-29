@@ -79,6 +79,8 @@
 
 #define STAT_HELP   "print statistics\r\n"                                                          \
                     "usage: stat"
+#define READ_HELP   "Read a string record\r\n"                                                      \
+                    "usage: read file_id key"
 
 #define GC_HELP     "run garbage collection\r\n"                                                    \
                     "usage: gc"
@@ -532,6 +534,66 @@ static void gc_cmd(nrf_cli_t const * p_cli, size_t argc, char ** argv)
             break;
     }
 }
+static void print_record_as_string(nrf_cli_t const * p_cli, uint32_t file_id, uint32_t key)
+{
+    fds_record_desc_t desc = {0};
+    fds_find_token_t token = {0};
+
+    if (fds_record_find(file_id, key, &desc, &token) == FDS_SUCCESS)
+    {
+        fds_flash_record_t frec;
+        ret_code_t rc = fds_record_open(&desc, &frec);
+
+        if (rc == FDS_SUCCESS)
+        {
+            // 문자열 출력
+            char *str = (char *)frec.p_data;
+            uint32_t len = frec.p_header->length_words * 4;  // byte 단위 길이
+
+            // 안전하게 NULL-terminate 처리
+            static char buffer[256];
+            memset(buffer, 0, sizeof(buffer));
+            memcpy(buffer, str, len < sizeof(buffer) ? len : sizeof(buffer)-1);
+
+            nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,
+                            "record string (file=0x%x, key=0x%x): \"%s\"\r\n",
+                            file_id, key, buffer);
+
+            fds_record_close(&desc);
+        }
+        else
+        {
+            nrf_cli_fprintf(p_cli, NRF_CLI_ERROR,
+                            "error: fds_record_open() failed: %s\r\n",
+                            fds_err_str[rc]);
+        }
+    }
+    else
+    {
+        nrf_cli_fprintf(p_cli, NRF_CLI_ERROR,
+                        "error: record not found (file=0x%x, key=0x%x)\r\n", file_id, key);
+    }
+}
+
+static void read_str_cmd(nrf_cli_t const * p_cli, size_t argc, char ** argv)
+{
+    if (nrf_cli_help_requested(p_cli))
+    {
+        nrf_cli_help_print(p_cli, NULL, 0);
+    }
+    else {
+        if (argc != 3)
+        {
+            cli_wrong_param_count_help(p_cli, "read");
+            return;
+        }
+
+        uint32_t fid = strtol(argv[1], NULL, 16);
+        uint32_t key = strtol(argv[2], NULL, 16);
+
+        print_record_as_string(p_cli, fid, key);
+    }
+}
 
 
 NRF_CLI_CREATE_STATIC_SUBCMD_SET(m_print)
@@ -549,3 +611,4 @@ NRF_CLI_CMD_REGISTER(delete,     NULL,     DELETE_HELP,     delete_cmd);
 NRF_CLI_CMD_REGISTER(delete_all, NULL,     DELETE_ALL_HELP, delete_all_cmd);
 NRF_CLI_CMD_REGISTER(gc,         NULL,     GC_HELP,         gc_cmd);
 NRF_CLI_CMD_REGISTER(stat,       NULL,     STAT_HELP,       stat_cmd);
+NRF_CLI_CMD_REGISTER(read,       NULL,     READ_HELP,       read_str_cmd);

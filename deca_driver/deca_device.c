@@ -156,7 +156,10 @@ int dwt_initialise(uint16 config)
     pdw1000local->cbRxErr = NULL;
 
     // Read and validate device ID return -1 if not recognised
-    if (DWT_DEVICE_ID != dwt_readdevid()) // MP IC ONLY (i.e. DW1000) FOR THIS CODE
+
+    uint64_t id = dwt_readdevid();
+
+    if (DWT_DEVICE_ID != id) // MP IC ONLY (i.e. DW1000) FOR THIS CODE
     {
         return DWT_ERROR ;
     }

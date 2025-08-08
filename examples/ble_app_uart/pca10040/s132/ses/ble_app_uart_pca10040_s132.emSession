@@ -24,6 +24,7 @@
   <ProjectSessionItem path="ble_app_uart_pca10040_s132"/>
   <ProjectSessionItem path="ble_app_uart_pca10040_s132;ble_app_uart_pca10040_s132"/>
   <ProjectSessionItem path="ble_app_uart_pca10040_s132;ble_app_uart_pca10040_s132;Application"/>
+  <ProjectSessionItem path="ble_app_uart_pca10040_s132;ble_app_uart_pca10040_s132;Decadriver"/>
   <ProjectSessionItem path="ble_app_uart_pca10040_s132;ble_app_uart_pca10040_s132;nRF_Libraries"/>
   <ProjectSessionItem path="ble_app_uart_pca10040_s132;ble_app_uart_pca10040_s132;Segger Startup Files"/>
  </Project>
@@ -58,17 +59,20 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="12" useTextEdit="1" path="../../../main.c" left="0" selected="1" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="1" y="24" useTextEdit="1" path="../../../main.c" left="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="44" y="472" useTextEdit="1" path="ble_init_main.c" left="0" top="455" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="2" y="68" useTextEdit="1" path="ss_init_main.c" left="0" top="53" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="369" useTextEdit="1" path="fd_init_main.c" left="0" top="351" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="5" y="441" useTextEdit="1" path="ss_init_main.c" left="0" top="45" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="369" useTextEdit="1" path="fd_init_main.c" left="0" top="347" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="15" y="48" useTextEdit="1" path="fds_example.h" left="0" top="47" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="34" y="2272" useTextEdit="1" path="../config/sdk_config.h" left="0" top="2250" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="19" y="1477" useTextEdit="1" path="../config/sdk_config.h" left="0" top="1688" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="11" y="1917" useTextEdit="1" path="../../../../../nRF5_SDK_14.2.0/components/libraries/fds/fds.c" left="0" top="1899" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="54" y="586" useTextEdit="1" path="cli.c" left="0" top="580" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="54" y="586" useTextEdit="1" path="cli.c" left="0" top="575" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="10" y="156" useTextEdit="1" path="../../../../../nRF5_SDK_14.2.0/components/libraries/fds/fds.h" left="0" top="139" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="96" useTextEdit="1" path="../../../../../nRF5_SDK_14.2.0/components/libraries/util/app_error_weak.c" left="0" top="75" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="8" y="43" useTextEdit="1" path="default_config.h" left="0" top="38" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="96" useTextEdit="1" path="../../../../../nRF5_SDK_14.2.0/components/libraries/util/app_error_weak.c" left="0" top="70" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="8" y="43" useTextEdit="1" path="default_config.h" left="0" selected="1" top="5" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" path="config.c" left="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" path="tdoa.c" left="0" top="63" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" path="tdoa.h" left="0" top="0" codecName="Default"/>
  </Files>
  <EMStudioWindow activeProject="ble_app_uart_pca10040_s132" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="/home/sjo/dwm1001-examples/examples/ble_app_uart/pca10040/s132/ses" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

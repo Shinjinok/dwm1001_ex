@@ -723,6 +723,8 @@ extern void cli_init(void);
 extern void cli_start(void);
 extern void cli_process(void);
 extern void delete_all_process(void);
+extern void dw1000_init(void);
+extern void ss_init_run(void);
 /**@brief Application main function.
  */
 int main(void)
@@ -760,18 +762,19 @@ int main(void)
     printf("\r\nUART started.\r\n");
     NRF_LOG_INFO("Debug logging for UART over RTT started.");
     
-
+    dw1000_init();
     // 메인 루프
     for (;;)
     {
         if (!NRF_LOG_PROCESS())
         {
       //    idle_state_handle();
-          power_manage();
+        //  power_manage();
         }
 
         cli_process();         // CLI 입력 처리
         delete_all_process();  // delete_all 명령 처리
+        ss_init_run();
     }
 }
 

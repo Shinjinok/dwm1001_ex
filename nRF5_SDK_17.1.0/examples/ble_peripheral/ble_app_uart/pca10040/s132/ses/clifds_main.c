@@ -255,7 +255,7 @@ static void log_init(void)
 
 
 /**@brief   Sleep until an event is received. */
-static void power_manage(void)
+void power_manage(void)
 {
 #ifdef SOFTDEVICE_PRESENT
     (void) sd_app_evt_wait();
@@ -278,17 +278,9 @@ static void wait_for_fds_ready(void)
 void cli_fds_main(void)
 {
     ret_code_t rc;
-
-#ifdef SOFTDEVICE_PRESENT
-   // ble_stack_init();
-#else
-    clock_init();
-#endif
-
-    timer_init();
-    log_init();
+    
+    // CLI 초기화
     cli_init();
-
     NRF_LOG_INFO("FDS example started.")
 
     /* Register first to receive an event when initialization is complete. */
@@ -299,7 +291,7 @@ void cli_fds_main(void)
     rc = fds_init();
     APP_ERROR_CHECK(rc);
 
-    /* Wait for fds to initialize. */
+    /* Wait for fds to initialize. */// FDS 초기화 완료 대기
     wait_for_fds_ready();
 
     NRF_LOG_INFO("Available commands:");
@@ -375,18 +367,18 @@ void cli_fds_main(void)
         }
     }
 
-    cli_start();
+    //cli_start();
 
-    /* Enter main loop. */
-    for (;;)
-    {
-        if (!NRF_LOG_PROCESS())
-        {
-            power_manage();
-        }
-        cli_process();
-        delete_all_process();
-    }
+    ///* Enter main loop. */
+    //for (;;)
+    //{
+    //    if (!NRF_LOG_PROCESS())
+    //    {
+    //        power_manage();
+    //    }
+    //    cli_process();
+    //    delete_all_process();
+    //}
 }
 
 

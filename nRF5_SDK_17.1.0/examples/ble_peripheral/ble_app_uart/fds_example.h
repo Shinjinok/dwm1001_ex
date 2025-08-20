@@ -47,6 +47,8 @@
 
 #define CONFIG_FILE     (0x8010)
 #define CONFIG_REC_KEY  (0x7010)
+#define DECA_FILE     (0xDECA)
+#define DECA_REC_KEY  (0x1001)
 
 /* Colors used to print on the console. */
 

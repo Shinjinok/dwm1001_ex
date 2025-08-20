@@ -57,11 +57,13 @@
 #define NRF_LOG_MODULE_NAME app
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
-
+#include "default_config.h"
 
 /* A tag identifying the SoftDevice BLE configuration. */
 #define APP_BLE_CONN_CFG_TAG    1
 
+const param_block_t defaultFConfig  = DEFAULT_CONFIG;
+param_block_t dwm_param;
 /* Array to map FDS events to strings. */
 static char const * fds_evt_str[] =
 {
@@ -281,7 +283,7 @@ void cli_fds_main(void)
     
     // CLI 초기화
     cli_init();
-    NRF_LOG_INFO("FDS example started.")
+    NRF_LOG_INFO("FDS example started.");
 
     /* Register first to receive an event when initialization is complete. */
     (void) fds_register(fds_evt_handler);
@@ -341,15 +343,15 @@ void cli_fds_main(void)
         APP_ERROR_CHECK(rc);
 
         /* Write the updated record to flash. */
-        rc = fds_record_update(&desc, &m_dummy_record);
-        if ((rc != NRF_SUCCESS) && (rc == FDS_ERR_NO_SPACE_IN_FLASH))
-        {
-            NRF_LOG_INFO("No space in flash, delete some records to update the config file.");
-        }
-        else
-        {
-            APP_ERROR_CHECK(rc);
-        }
+        //rc = fds_record_update(&desc, &m_dummy_record);
+        //if ((rc != NRF_SUCCESS) && (rc == FDS_ERR_NO_SPACE_IN_FLASH))
+        //{
+        //    NRF_LOG_INFO("No space in flash, delete some records to update the config file.");
+        //}
+        //else
+        //{
+        //    APP_ERROR_CHECK(rc);
+        //}
     }
     else
     {
@@ -366,8 +368,73 @@ void cli_fds_main(void)
             APP_ERROR_CHECK(rc);
         }
     }
+    fds_record_desc_t desc2 = {0};
+    fds_find_token_t  tok2  = {0};
+     
+    rc = fds_record_find(0xDECA, 0x1001, &desc2, &tok2);
 
-    //cli_start();
+    if (rc == NRF_SUCCESS)
+    {
+        /* A config file is in flash. Let's update it. */
+        fds_flash_record_t config = {0};
+        
+        /* Open the record and read its contents. */
+        rc = fds_record_open(&desc2, &config);
+        APP_ERROR_CHECK(rc);
+
+        /* Copy the configuration from flash into m_dummy_cfg. */
+        
+        memcpy(&dwm_param, config.p_data, sizeof(param_block_t));
+
+        NRF_LOG_INFO("Config file found, updating");
+
+        /* Update boot count. */
+        //temp_p.boot_count++;
+
+        /* Close the record when done reading. */
+        rc = fds_record_close(&desc2);
+        APP_ERROR_CHECK(rc);
+
+
+        //fds_record_t temp;
+        //temp.file_id = 0xDECA;
+        //temp.key = 0x1001;
+        //temp.data.p_data = &temp_p;
+        //temp.data.length_words = (sizeof(param_block_t) + 3) / sizeof(uint32_t);
+        /* Write the updated record to flash. */
+        //rc = fds_record_update(&desc, &temp);
+        //if ((rc != NRF_SUCCESS) && (rc == FDS_ERR_NO_SPACE_IN_FLASH))
+        //{
+        //    NRF_LOG_INFO("No space in flash, delete some records to update the config file.");
+        //}
+        //else
+        //{
+        //    APP_ERROR_CHECK(rc);
+        //}
+    }
+    else
+    {
+        /* System config not found; write a new one. */
+        dwm_param = defaultFConfig;
+        NRF_LOG_INFO("Current Param is set DefaultConfig\r\n");
+        NRF_LOG_INFO("Writing Default config file...");
+        fds_record_t temp;
+        temp.file_id = 0xDECA;
+        temp.key = 0x1001;
+        temp.data.p_data = &defaultFConfig;
+        temp.data.length_words = (sizeof(param_block_t) + 3) / sizeof(uint32_t);
+        rc = fds_record_write(&desc, &temp);
+        
+        if ((rc != NRF_SUCCESS) && (rc == FDS_ERR_NO_SPACE_IN_FLASH))
+        {
+            NRF_LOG_INFO("No space in flash, delete some records to update the config file.");
+        }
+        else
+        {
+            APP_ERROR_CHECK(rc);
+        }
+    }
+    cli_start();
 
     ///* Enter main loop. */
     //for (;;)

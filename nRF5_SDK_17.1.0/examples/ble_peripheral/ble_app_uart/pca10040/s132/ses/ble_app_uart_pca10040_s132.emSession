@@ -59,12 +59,10 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="730" useTextEdit="1" path="../../../main.c" left="0" selected="1" top="721" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="13" y="460" useTextEdit="1" path="ss_init_main.c" left="0" top="156" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="5" y="192" useTextEdit="1" path="../../../../../../../deca_driver/port/port_platform.c" left="0" top="62" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="52" y="81" useTextEdit="1" path="tdoa.c" left="0" top="69" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="161" useTextEdit="1" path="../../../../../../../deca_driver/deca_device.c" left="0" top="200" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="99" useTextEdit="1" path="../../../../../../components/libraries/util/app_error_weak.c" left="0" top="71" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="75" useTextEdit="1" path="../../../main.c" left="0" top="51" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="5" y="192" useTextEdit="1" path="../../../../../../../deca_driver/port/port_platform.c" left="0" top="168" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="161" useTextEdit="1" path="../../../../../../../deca_driver/deca_device.c" left="0" top="161" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="26" y="58" useTextEdit="1" path="../../../../../../components/libraries/util/app_error_weak.c" left="0" selected="1" top="32" codecName="Default"/>
  </Files>
- <EMStudioWindow activeProject="ble_app_uart_pca10040_s132" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="/home/sjo/dwm1001-examples/nRF5_SDK_17.1.0/examples/ble_peripheral/ble_app_uart/pca10040/s132/ses" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <EMStudioWindow activeProject="ble_app_uart_pca10040_s132" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="/home/sjo/dwm1001-examples/nRF5_SDK_17.1.0/examples/ble_peripheral/ble_app_uart/pca10040/s132/ses" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

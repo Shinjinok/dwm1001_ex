@@ -8,5 +8,6 @@
         "nrf_ringbuf.h": "c",
         "segger_rtt.h": "c",
         "dw1001_dev.h": "c"
-    }
+    },
+    "cmake.sourceDirectory": "/home/sjo/dwm1001-examples/nRF5_SDK_14.2.0/external/mbedtls"
 }

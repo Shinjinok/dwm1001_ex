@@ -102,6 +102,27 @@ typedef struct {
 }CRCprotected_param_t;
 #pragma pack(pop)
 
+typedef struct
+{
+    param_block_t  	*pConfig;
+    uint32_t      	blinkenable;
+    uint32_t		*pcurrent_blink_interval_ms;
+    uint8_t      	uartRx;
+}app_cfg_t;
+
+typedef struct blink_msg{
+	uint32_t header;
+	uint32_t anchor_id;
+	uint32_t sqnumber;
+    int32_t	anchor_x;   
+	int32_t anchor_y;
+	int32_t anchor_z;
+	uint32_t tx_delay;
+	uint32_t sync_delay;
+	uint16_t check;
+}blink_msg_t;
+
+
 
 #ifdef __cplusplus
 }

@@ -49,7 +49,8 @@
 #include "nrf_soc.h"
 #include "sdk_config.h"
 #include "fds_example.h"
-
+#include "default_config.h"
+#include "translate.h"
 
 #define PRINT_HELP  "print records\n"                                                             \
                     "usage: print all|config"
@@ -59,6 +60,8 @@
 
 #define PRINT_CFG_HELP  "print configuration\n"                                                   \
                         "usage: print config"
+#define PRINT_DECA_HELP  "print DECA configuration\n"                                                   \
+                        "usage: print deca"
 
 #define WRITE_HELP  "write a record\n"                                                            \
                     "usage: write file_id key \"data\"\n"                                         \
@@ -85,7 +88,7 @@
 
 
 NRF_CLI_UART_DEF(cli_uart, 0, 64, 16);
-NRF_CLI_DEF(m_cli_uart, "fds example:~$ ", &cli_uart.transport, '\r', 4);
+NRF_CLI_DEF(m_cli_uart, "DWM1001:~$ ", &cli_uart.transport, '\r', 4);
 
 
 /* Defined in main.c */
@@ -322,7 +325,68 @@ static void print_cfg_cmd(nrf_cli_t const * p_cli, size_t argc, char ** argv)
         APP_ERROR_CHECK(rc);
     }
 }
+static void print_deca_cmd(nrf_cli_t const * p_cli, size_t argc, char ** argv)
+{
+    fds_record_desc_t desc = {0};
+    fds_find_token_t  tok  = {0};
 
+    while (fds_record_find(DECA_FILE, DECA_REC_KEY, &desc, &tok) == NRF_SUCCESS)
+    {
+        ret_code_t rc;
+        fds_flash_record_t frec = {0};
+
+        rc = fds_record_open(&desc, &frec);
+        switch (rc)
+        {
+            case NRF_SUCCESS:
+                break;
+
+            case FDS_ERR_CRC_CHECK_FAILED:
+                nrf_cli_fprintf(p_cli, NRF_CLI_ERROR, "error: CRC check failed!\n");
+                continue;
+
+            case FDS_ERR_NOT_FOUND:
+                nrf_cli_fprintf(p_cli, NRF_CLI_ERROR, "error: record not found!\n");
+                continue;
+
+            default:
+            {
+                nrf_cli_fprintf(p_cli, NRF_CLI_ERROR,
+                                "error: unexpecte error %s.\n",
+                                fds_err_str(rc));
+
+                continue;
+            }
+        }
+
+        param_block_t * param = (param_block_t *)(frec.p_data);
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"{\"UWB PARAM\":{\r\n");
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"CHAN\":%d,\r\n",param->dwt_config.chan);
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"PRF\":%d,\r\n", deca_to_prf(param->dwt_config.prf));
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"PLEN\":%d,\r\n",deca_to_plen(param->dwt_config.txPreambLength));
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"DATARATE\":%d,\r\n",deca_to_bitrate(param->dwt_config.dataRate));
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"TXCODE\":%d,\r\n",param->dwt_config.txCode);
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"PAC\":%d,\r\n", deca_to_pac (param->dwt_config.rxPAC));
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"NSSFD\":%d,\r\n",param->dwt_config.nsSFD);
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"PHRMODE\":%d,\r\n",param->dwt_config.phrMode);
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"SMARTPOWER\":%d,\r\n",param->smartPowerEn);
+        //nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"BLINKFAST\":%lu,\r\n",param->blink.interval_in_ms);
+        //nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"BLINKSLOW\":%lu,\r\n",param->blink.interval_slow_in_ms);
+        //nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"RANDOMNESS\":%d,\r\n",param->blink.randomness);
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"TAGIDSET\":%d,\r\n",param->tagIDset);
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"ANCHORID\":%d,\r\n",param->anchorID);  
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"ANCHORX\":%d,\r\n",param->anchorX);
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"ANCHORY\":%d,\r\n",param->anchorY);
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"ANCHORZ\":%d,\r\n",param->anchorZ);
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"TXDELAY\":%d,\r\n",param->txDelay);
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"SYNCDELAY\":%d,\r\n",param->syncDelay);
+        nrf_cli_fprintf(p_cli, NRF_CLI_DEFAULT,"\"TAGID\":0x%02x%02x%02x%02x%02x%02x%02x%02x}}\r\n",
+                                                   param->tagID[7], param->tagID[6], param->tagID[5], param->tagID[4],
+                                                   param->tagID[3], param->tagID[2], param->tagID[1], param->tagID[0]);
+        rc = fds_record_close(&desc);
+        APP_ERROR_CHECK(rc);
+    }
+}
 
 static void print_all_cmd(nrf_cli_t const * p_cli, size_t argc, char ** argv)
 {
@@ -540,6 +604,7 @@ NRF_CLI_CREATE_STATIC_SUBCMD_SET(m_print)
 {
     NRF_CLI_CMD(all,    NULL, PRINT_ALL_HELP, print_all_cmd),
     NRF_CLI_CMD(config, NULL, PRINT_CFG_HELP, print_cfg_cmd),
+    NRF_CLI_CMD(deca, NULL, PRINT_DECA_HELP, print_deca_cmd),
     NRF_CLI_SUBCMD_SET_END
 };
 

@@ -59,7 +59,7 @@
 //#include "ss_init_main.h"
 //#include "UART.h"
 #include "tdoa.h"
-#include "default_config.h"
+
 
 #define APP_NAME "SS TWR INIT v1.3"
 
@@ -464,6 +464,9 @@ void dw1000_init(void)
     while (1) {};
   }
 
+ // uint64_t eui64=0x1234;
+ //// dwt_seteui((uint8_t*)&eui64);
+ // dwt_geteui((uint8_t*)&eui64);
   // Set SPI to 8MHz clock  
   port_set_dw1000_fastrate();
 
